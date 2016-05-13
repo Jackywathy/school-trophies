@@ -6,7 +6,7 @@ from dxfwrite import DXFEngine as dxf
 offset_left = 0
 
 
-drawing = dxf.drawing("tropARCHIE.dxf")
+drawing = dxf.drawing("trop.dxf")
 drawing.add_layer('dxfwrite')
 drawing.add_layer('LINES')
 
