@@ -21,8 +21,7 @@ def create_outline(drawing, x = 0,y = 0):
 
 def create_text(text,x,y,height,drawing, style="TIMES_ITALIC"):
     """Create a line in the given drawing"""
-    
-    text_var = dxf.mtext(text,(x,y), height=height, style=style, mirror=dxfwrite.MIRROR_X, halign = dxfwrite.CENTER, valgin = dxfwrite.BOTTOM, layer='TEXT')
+    text_var = dxf.mtext(text,(x,y), height=height, style=style, mirror=dxfwrite.MIRROR_X, halign = dxfwrite.CENTER, valgin = dxfwrite.TOP, layer='TEXT')
     drawing.add(text_var)
 
 def create_name(text, x, y, height, drawing, style = "STANDARD"):
@@ -40,5 +39,5 @@ create_text("School",45,90,10,drawing)
 create_text("Trophy",45,77,10,drawing)
 #TODO PUT IN THE RIGHT DIMENSIONS FOR THE awarded to!
 create_text("awarded to", 45, 48, 5, drawing)
-create_text("SHOVEL+Archie+=Jack",45,38,5.5,drawing,style = "STANDARD")
+create_text("Shovel, Jack, Archie",45,38,5.5,drawing,style = "STANDARD")
 drawing.save()
