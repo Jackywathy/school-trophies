@@ -24,6 +24,11 @@ def create_text(text,x,y,height,drawing, style="TIMES_ITALIC"):
     text_var = dxf.mtext(text,(x,y), height=height,style=style,mirror=dxfwrite.MIRROR_X,layer='TEXT')
     drawing.add(text_var)
 
+def create_name(text, x, y, height, drawing, style = "STANDARD"):
+    """Creates the name, by THE MAGIC OF SCALING!! SO long names are a little smaller"""
+    line_height = 100 # the length of the line
+    length_letter = (line_height)//len(text)
+    # then do something?
 
 
 create_outline(drawing)
@@ -34,5 +39,5 @@ create_text("School",67,90,10,drawing)
 create_text("Trophy",67,77,10,drawing)
 #TODO PUT IN THE RIGHT DIMENSIONS FOR THE awarded to!
 create_text("awarded to", 63, 48, 5, drawing)
-create_text("SHOVEL And JAKK",56,38,5.5,drawing,style = "STANDARD")
+create_text("SHOVEL+Archie+=Jack",56,38,5.5,drawing,style = "STANDARD")
 drawing.save()
