@@ -2,6 +2,8 @@ from dxfwrite.const import CENTER
 import dxfwrite
 from dxfwrite import DXFEngine as dxf
 
+__author__ = 'Shovel, Jack, and Archie @sydneyboyshigh.com? Copyright 2016'
+
 h1=155.5 ################
 h2= 225 ################
 w = 90.4 #################
@@ -75,7 +77,7 @@ def draw(x,y,x1,x2,d):
     d.add(dxf.line((x,y),(x1,x2),color=1, layer='LINES',thickness=0.01))
 
 def text(s,x,y,height,d):
-    text = dxf.mtext(s,(x,y), height=height,style="TIMES_ITALIC",mirror=dxfwrite.MIRROR_X,layer='TEXT')
+    text = dxf.mtext(s,(x,y), height=height,style="TIMES_ITALIC",mirror=dxfwrite.MIRROR_X,layer='LINES')
     d.add(text)
 
 
