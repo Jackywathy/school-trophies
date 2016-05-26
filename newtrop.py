@@ -11,7 +11,7 @@ w = 90.4 #################
 mid_trophy = 45
 black = 250
 
-
+file_out = []
 
 drawing1 = dxf.drawing("template.dxf")
 drawing_trophy = dxf.drawing('Trophy.dxf')
