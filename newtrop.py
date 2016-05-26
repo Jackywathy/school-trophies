@@ -75,13 +75,15 @@ def generate_template(h1,h2,w,drawing):
 def draw(x,y,x1,x2,d):
     d.add(dxf.line((x,y),(x1,x2),color=1, layer='LINES',thickness=0.01))
 
+
 def text(s,x,y,height,d,style="TIMES_ITALIC"):
     text = dxf.mtext(s,(x,y), height=height,style=style,mirror=dxfwrite.MIRROR_X,layer='LINES')
     d.add(text)
+    print("DEPRECIATED-PLEASE USED text_align() !(shovel+archie)")
 
-def text_align(text, x_align,y_align,height, d ,style= "TIMES_ITALIC",rotation=0):
+def text_align(text, x_align,y_align,height, d ,style= "TIMES_ITALIC",rotation=0, color = 250):
     """Creates text with the middle aligned to x_al. and y_al."""
-    text = dxf.text(text, height = height,mirror=dxfwrite.MIRROR_X,halign=CENTER, alignpoint = (x_align,y_align), style = style, layer='LINES',rotation=rotation)
+    text = dxf.text(text, height = height,mirror=dxfwrite.MIRROR_X,halign=CENTER, alignpoint = (x_align,y_align), style = style, layer='LINES',rotation=rotation,color=color,linetype='ByBlock')
     d.add(text)
 
 def add_school_trophy_upright(ref_point, drawing, name, year):
@@ -163,8 +165,19 @@ add_school_trophy_upside_down(ref_points[9], drawing, 'A really very long name',
 add_school_trophy_upright(ref_points[8], drawing, 'Monster Kid', 2017)
 
 generate_template(h1,h2,w,drawing)
-drawing.saveas('outputlongnametrophies.dxf')
-print('done')
-os.startfile('outputlongnametrophies.dxf')
+filename = None
+counter = 1
+while True:
+
+    filename = 'output' + str(counter) + '.dxf'
+    try:
+        drawing.saveas(filename)
+        break
+    except PermissionError:
+        counter += 1
+        continue
+
+
+os.startfile(filename)
 
 
