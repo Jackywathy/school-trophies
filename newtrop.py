@@ -13,6 +13,10 @@ black = 250
 
 file_out = []
 
+# the bottom left corner of the trophy from the bottom left of a trophy. TODO PROPERLY FINISH THESE VARS?
+logo_width = float(40)
+logo_height = float(120)
+
 drawing1 = dxf.drawing("template.dxf")
 drawing_trophy = dxf.drawing('Trophy.dxf')
 drawing1.add_layer('dxfwrite')
@@ -91,6 +95,7 @@ def add_school_trophy_upright(ref_point, drawing, name, year):
     if len(name) > 23:
         return "Name must be shorter than 23 letters! Skipping", (name,year,ref_point)
     x,y = ref_point
+    file_out.append((logo_width/2 + x, logo_height + y, '000'))
     text_align('Sydney Boys High School',mid_trophy+x,122+y,4.7,drawing)
     text_align('Student Award Scheme',mid_trophy+x,112+y,5.7,drawing)
     text_align("The",mid_trophy+x,92+y,10,drawing)
@@ -180,4 +185,14 @@ while True:
 
 os.startfile(filename)
 
+with open('logopoints.txt', 'w') as f:
+    for item in file_out:
+        print(str(item[2]) + "{0:.2f}".format(item[0]) + ',' + "{0:.2f}".format(item[1]), file = f)
 
+
+# format of this file
+
+# first three letters are 000, 090, 180, 270, sepecifying the rotation
+# then the rest is in this form x_cord,ycord
+#  Example: 000100,200
+#           180200,300
