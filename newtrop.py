@@ -154,7 +154,7 @@ add_school_trophy_top(ref_points[2], drawing, 'Isaiah Wibowo', 2017)
 add_school_trophy_top(ref_points[3], drawing, 'Jason Wang', 2017)
 
 add_school_trophy_bottom(ref_points[4], drawing, 'Archie Fox', 2017)
-add_school_trophy_bottom(ref_points[5], drawing, 'Eugene Kang', 2017)
+add_school_trophy_bottom(ref_points[5], drawing, 'Shovel Quazi', 2017)
 add_school_trophy_bottom(ref_points[6], drawing, 'Mr Comben', 2017)
 add_school_trophy_bottom(ref_points[7], drawing,  'Jackk Jiang', 2017)
 
