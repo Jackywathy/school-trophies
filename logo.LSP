@@ -1,15 +1,10 @@
 (defun ins (xy rotation)
 
-  (command ".insert" "crest.dwg" xy "1" "1" rotation
-	   "_.explode" "_last" ""
-	   )
-  
-
-  
+  (command ".insert" "crest.dwg" xy "1" "1" rotation)
 )
 
   
-(defun runfile ()
+(defun C:runfile ()
   if (setq f (open "logopoints.txt" "r"))
   (while
     (setq txtLine(read-line f))
@@ -17,6 +12,6 @@
     (setq rotat (substr txtline 1 3))
     (ins xyr rotat)
   )
+  (command "regenall" "")
 
 )
-(runfile)
