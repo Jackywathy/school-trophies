@@ -28,12 +28,12 @@ drawing1.add(dxf.line((600,450), (0,450), color=255, layer='LINES', thickness=0.
 drawing1.add(dxf.line((0,450), (0,0), color=255, layer='LINES', thickness=0.00))
 
 # sum constants
-crest_y = 132
-sbhs_y = 121 # sydney boys high
-sac_y = 111 # student award scheme
+crest_y = 129
+sbhs_y = 120 # sydney boys high
+sac_y = 110   # student award scheme
 the_y = 91
 school_y = 79
-trophy_y = 67.2
+trophy_y = 67
 awarded_y = 44.5
 name_y = 34.5
 year_y = 24
@@ -131,8 +131,23 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
 
     if long_side_dir == 'down':
         # long side is down!
+        rotation = 270
+        file_out.append((x_r + crest_y, y_r -mid_trophy, '270'))
+
+        x_sbhs,y_sbhs = x_r + sbhs_y, y_r - mid_trophy
+        x_sac, y_sac = x_r + sac_y,  y_r - mid_trophy
+        x_the, y_the = x_r + the_y, y_r - mid_trophy
+        x_school, y_school = x_r + school_y, y_r - mid_trophy
+        x_trophy,y_trophy = x_r + trophy_y, y_r - mid_trophy
+        x_awarded, y_awarded = x_r + awarded_y, y_r - mid_trophy
+        x_name, y_name = x_r + name_y, y_r - mid_trophy
+        x_year, y_year = x_r + year_y, y_r - mid_trophy
+
+    elif long_side_dir == 'up':
+        # if trophy is pointing up (long edge paralel to
         rotation = 90
-        file_out.append((x_r + mid_trophy, y_r+crest_y, '090'))
+        file_out.append((x_r - crest_y, y_r + mid_trophy, '090'))
+
         x_sbhs,y_sbhs = x_r - sbhs_y, y_r + mid_trophy
         x_sac, y_sac = x_r - sac_y,  y_r + mid_trophy
         x_the, y_the = x_r - the_y, y_r + mid_trophy
@@ -141,16 +156,6 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         x_awarded, y_awarded = x_r - awarded_y, y_r + mid_trophy
         x_name, y_name = x_r - name_y, y_r + mid_trophy
         x_year, y_year = x_r - year_y, y_r + mid_trophy
-
-        x_trophy, y_trophy = mid_trophy + x_r, y_r + trophy_y
-        x_awarded, y_awarded = mid_trophy + x_r, y_r + awarded_y
-        x_name, y_name= mid_trophy + x_r, y_r + name_y
-        x_year, y_year= mid_trophy + x_r, y_r + year_y
-
-
-    elif long_side_dir == 'up':
-        # if trophy is pointing up (long edge paralel to
-        ...
 
     elif long_side_dir == 'right':
         # if the trophey is straight
@@ -180,18 +185,14 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
     else:
         raise BaseException('long side direction must be down, up, right or left')
 
-
-
-
-
     if len(name) > 23:
+        print("Name must be shorter than 23 letters! Skipping", (name,year,ref_point))
         return "Name must be shorter than 23 letters! Skipping", (name,year,ref_point)
-    x,y = ref_point
 
-    text_align('Sydney Boys High School', x_sbhs,y_sbhs,4.7,drawing,rotation=rotation)
-    text_align('Student Award Scheme',x_sac+x,y_sac,5.7,drawing,rotation=rotation)
-    text_align("The",x_the,y_the,10,drawing,rotation=rotation)
-    text_align("School",x_school, y_school,10.5,drawing,rotation=rotation)
+    text_align('Sydney Boys High School', x_sbhs, y_sbhs, 4.7, drawing,rotation=rotation)
+    text_align('Student Award Scheme', x_sac, y_sac, 5.7,drawing, rotation=rotation)
+    text_align("The", x_the, y_the, 10.5, drawing, rotation=rotation)
+    text_align("School", x_school, y_school,10.5,drawing,rotation=rotation)
     text_align("Trophy",x_trophy, y_trophy,10.5,drawing,rotation=rotation)
     text_align("awarded to", x_awarded, y_awarded,7, drawing,rotation=rotation)
     text_align(name.upper(), x_name,y_name,4.5,drawing, style = 'STANDARD',rotation=rotation)
@@ -201,63 +202,27 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
 
 
 
-
-def add_school_trophy_top(ref_point, drawing, name, year):
-    """Adds a trophy to the drawing, where ref_points is the bottom left corner under short side. Trophy will be lying on the long side down"""
-    
-    if len(name) > 23:
-        return "Name must be shorter than 23 letters! Skipping", (name,year,ref_point)
-    x,y = ref_point
-    file_out.append((x+crest_y, y-mid_trophy, '270'))
-    text_align('Sydney Boys High School', sbhs_y+x, y-mid_trophy,4.7,drawing,rotation=270)
-    text_align('Student Award Scheme', sac_y+x, y-mid_trophy,5.7,drawing,rotation=270)
-    text_align("The",the_y+x,y-mid_trophy,10,drawing,rotation=270)
-    text_align("School",       school_y + x, y-mid_trophy, 10.5, drawing,rotation=270)
-    text_align("Trophy",     67.2 + x, y-mid_trophy, 10.5, drawing,rotation=270)
-    text_align("awarded to", 44.5 + x, y-mid_trophy, 7,    drawing,rotation=270)
-    text_align(name.upper(), 34.5 + x, y-mid_trophy, 4.5,  drawing, style = 'STANDARD',rotation=270)
-    text_align(str(year),      24 + x, y-mid_trophy, 6,    drawing,rotation=270)
-
-
-
-def add_school_trophy_bottom(ref_point, drawing, name, year):
-    '''Adds a trophy into the drawing, where ref point is the bottom left corner under short side. Trophy will have long edge pointing up'''
-    if len(name) > 23:
-        return "Name must be shorter than 23 letters! Skipping", (name,year,ref_point)
-    x,y = ref_point
-    file_out.append((x-crest_y, y+mid_trophy, ' 90'))
-    text_align('Sydney Boys High School', x-sbhs_y, y+mid_trophy,4.7,drawing,rotation=90)
-    text_align('Student Award Scheme', x-sac_y, y+mid_trophy,5.7,drawing,rotation=90)
-    text_align("The",  x-the_y ,y+mid_trophy,10,drawing,rotation=90)
-    text_align("School",       x-school_y, y+mid_trophy, 10.5, drawing,rotation=90)
-    text_align("Trophy",      x-67.2, y+mid_trophy, 10.5, drawing,rotation=90)
-    text_align("awarded to",  x-44.5, y+mid_trophy, 7,    drawing,rotation=90)
-    text_align(name.upper(),  x-34.5, y+mid_trophy, 4.5,  drawing, style = 'STANDARD',rotation=90)
-    text_align(str(year),     x-24, y+mid_trophy, 6,    drawing,rotation=90)
-
-def add_school_trophy_upside_down(ref_point, drawing, name, year):
-    '''Adds a trophy into the drawing, where ref point is the bottom left corner under short side. Trophy will be upside down *duh?* '''
-    if len(name) > 23:
-        return "Name must be shorter than 23 letters! Skipping", (name,year,ref_point)
-    x,y = ref_point
-    file_out.append((x-mid_trophy, y-crest_y, '180'))
-    text_align('Sydney Boys High School',x-mid_trophy,y-sbhs_y,4.7,drawing,rotation = 180)
-    text_align('Student Award Scheme',x-mid_trophy,y-sac,5.7,drawing,rotation = 180)
-    text_align("The",x-mid_trophy,y-the,10,drawing,rotation = 180)
-    text_align("School",x-mid_trophy,y-school,10.5,drawing,rotation = 180)
-    text_align("Trophy",x-mid_trophy,y-67.2,10.5,drawing,rotation = 180)
-    text_align("awarded to", x-mid_trophy, y-44.5,7, drawing,rotation = 180)
-    text_align(name.upper(),x-mid_trophy,y-34.5,4.5,drawing, style = 'STANDARD',rotation = 180)
-    text_align(str(year), x-mid_trophy, y-24,6, drawing,rotation = 180)
-
-
-
 drawing = dxf.drawing()
 ref_points = (generate_ref_point(h1,h2,w))
 
 generate_template(h1,h2,w,drawing)
 filename = None
 counter = 1
+add_school_trophy(ref_points[0], drawing, 'Jack Jianq', 2016, 'down')
+add_school_trophy(ref_points[1], drawing, 'Brendan Qwan', 2016, 'down')
+add_school_trophy(ref_points[2], drawing, 'Widhiwipati Widyatamaka', 2016, 'down')
+add_school_trophy(ref_points[3], drawing, 'Shourov Quazi', 2016, 'down')
+
+add_school_trophy(ref_points[4], drawing, 'Mr. Comben', 2016, 'up')
+add_school_trophy(ref_points[5], drawing, 'Dr. Jaggar', 2016, 'up')
+add_school_trophy(ref_points[6], drawing, 'Ms. Dam', 2016, 'up')
+add_school_trophy(ref_points[7], drawing, 'Mr. Huynh', 2016, 'up')
+
+
+add_school_trophy(ref_points[8], drawing, 'Monster Kid', 2016, 'right')
+add_school_trophy(ref_points[9], drawing, 'Toriel Dreamurr', 2016, 'left')
+
+
 while True:
 
     filename = 'output' + str(counter) + '.dxf'
