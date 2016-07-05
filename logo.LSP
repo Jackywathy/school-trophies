@@ -1,5 +1,3 @@
-
-
 (defun _insert (xy rotation)
   (command ".insert" "schoolcrest.dwg" xy "1" "1" rotation)
 )

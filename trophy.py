@@ -18,6 +18,7 @@ file_out = []
 logo_width = float(40)
 logo_height = float(120)
 
+
 drawing1 = dxf.drawing("template.dxf")
 drawing_trophy = dxf.drawing('Trophy.dxf')
 drawing1.add_layer('dxfwrite')
