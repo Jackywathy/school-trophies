@@ -2,6 +2,8 @@ from dxfwrite.const import CENTER
 import dxfwrite
 from dxfwrite import DXFEngine as dxf
 import os
+import csv
+K_MAX_ITER = 100
 __author__ = 'Shovel, Jack, and Archie @sydneyboyshigh.com All Rights Unreserved'
 __version__ = 'Pre-Alpha 1.1'
 
@@ -21,7 +23,6 @@ logo_height = float(120)
 
 drawing1 = dxf.drawing("template.dxf")
 drawing_trophy = dxf.drawing('Trophy.dxf')
-drawing1.add_layer('dxfwrite')
 drawing1.add_layer('LINES')
 drawing1.add(dxf.line((0, 0), (600,0), color=255, layer='LINES', thickness=0.00))
 drawing1.add(dxf.line((600, 0), (600,450), color=255, layer='LINES', thickness=0.00))
@@ -40,27 +41,26 @@ name_y = 34.5
 year_y = 24
 
 
-
-
 def generate_ref_point(h1,h2,w):
     ref = []
     xgap = (600-(h1+h2+w))/4
     ygap1 = (450-(4*w))/5
     ygap2 = (450-(h1+h2))/3
-    #first collumn ref points
+    # first collumn ref points
     ref.append((xgap,ygap1+w))
     ref.append((xgap,2*ygap1+2*w))
     ref.append((xgap,3*ygap1+3*w))
     ref.append((xgap,4*ygap1+4*w))
-    #second collumn ref points
+    # second collumn ref points
     ref.append((2*xgap+h1+h2,ygap1))
     ref.append((2*xgap+h1+h2,2*ygap1+w))
     ref.append((2*xgap+h1+h2,3*ygap1+2*w))
     ref.append((2*xgap+h1+h2,4*ygap1+3*w))
-    #third collumn ref points
+    # third collumn ref points
     ref.append((3*xgap+h1+h2,ygap2))
     ref.append((3*xgap+h1+h2+w,2*ygap2+h2+h1))
     return ref
+
 
 def generate_template(h1,h2,w,drawing):
     drawing.add(dxf.line((0, 0), (600,0), color=255, layer='LINES', thickness=0.00))
@@ -91,45 +91,22 @@ def generate_template(h1,h2,w,drawing):
     draw(x-w,y,x-w,y-h2,drawing)
     draw(x-w,y-h2,x,y-h1,drawing)
     drawing.save()
-        
+
+
 def draw(x,y,x1,x2,d):
     d.add(dxf.line((x,y),(x1,x2),color=1, layer='LINES',thickness=0.01))
 
 
-def text(s,x,y,height,d,style="TIMES_ITALIC"):
-    text = dxf.mtext(s,(x,y), height=height,style=style,mirror=dxfwrite.MIRROR_X,layer='LINES')
-    d.add(text)
-    print("DEPRECIATED-PLEASE USED text_align() !(shovel+archie)")
-
-
-def text_align(text, x_align,y_align,height, d ,style= "TIMES_ITALIC",rotation=0, color = 250):
+def text_align(text, x_align, y_align, height, d ,style= "TIMES_ITALIC",rotation=0, color = 250):
     """Creates text with the middle aligned to x_al. and y_al."""
-    text = dxf.text(text, height = height,mirror=dxfwrite.MIRROR_X,halign=CENTER, alignpoint = (x_align,y_align), style = style, layer='LINES',rotation=rotation,color=color,linetype='ByBlock')
+    text = dxf.text(text, height = height,mirror=dxfwrite.MIRROR_X,halign=CENTER, alignpoint = (x_align,y_align),
+                    style=style, layer='LINES', rotation=rotation, color=color, linetype='ByBlock')
     d.add(text)
-'''
 
-def add_school_trophy_upright(ref_point, drawing, name, year):
-    """Adds a trophy to the drawing, where ref_points is the bottom left corner under short side. The trophey should be upgright, with long edge on right"""
-    if len(name) > 23:
-        return "Name must be shorter than 23 letters! Skipping", (name,year,ref_point)
-    x,y = ref_point
-    file_out.append((x+mid_trophy, y+crest_y, '000'))
-    text_align('Sydney Boys High School',mid_trophy+x,sbhs_y+y,4.7,drawing)
-    text_align('Student Award Scheme',mid_trophy+x,sac+y,5.7,drawing)
-    text_align("The",mid_trophy+x,the+y,10,drawing)
-    text_align("School",mid_trophy+x,school+y,10.5,drawing)
-    text_align("Trophy",mid_trophy+x,67.2+y,10.5,drawing)
-    text_align("awarded to", mid_trophy+x, 44.5+y,7, drawing)
-    text_align(name.upper(),mid_trophy+x,34.5+y,4.5,drawing, style = 'STANDARD')
-    text_align(str(year), mid_trophy+x, 24+y,6, drawing)
-
-
-
-'''
 
 def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
-    x_r,y_r = ref_point
-
+    print(name,year, long_side_dir)
+    x_r, y_r = ref_point
     if long_side_dir == 'down':
         # long side is down!
         rotation = 270
@@ -145,7 +122,7 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         x_year, y_year = x_r + year_y, y_r - mid_trophy
 
     elif long_side_dir == 'up':
-        # if trophy is pointing up (long edge paralel to
+        # if trophy is pointing up
         rotation = 90
         file_out.append((x_r - crest_y, y_r + mid_trophy, '090'))
 
@@ -159,7 +136,7 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         x_year, y_year = x_r - year_y, y_r + mid_trophy
 
     elif long_side_dir == 'right':
-        # if the trophey is straight
+        # if the trophy is straight
         rotation = 0
         file_out.append((x_r+mid_trophy, y_r+crest_y, '000'))
         x_sbhs,y_sbhs = mid_trophy + x_r, sbhs_y + y_r
@@ -187,59 +164,54 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         raise BaseException('long side direction must be down, up, right or left')
 
     if len(name) > 23:
-        print("Name must be shorter than 23 letters! Skipping", (name,year,ref_point))
-        return "Name must be shorter than 23 letters! Skipping", (name,year,ref_point)
+        print("Name must be shorter than 23 letters! Skipping", (name, year, ref_point))
+        return "Name must be shorter than 23 letters! Skipping", (name, year, ref_point)
 
     text_align('Sydney Boys High School', x_sbhs, y_sbhs, 4.7, drawing,rotation=rotation)
     text_align('Student Award Scheme', x_sac, y_sac, 5.7,drawing, rotation=rotation)
     text_align("The", x_the, y_the, 10.5, drawing, rotation=rotation)
-    text_align("School", x_school, y_school,10.5,drawing,rotation=rotation)
-    text_align("Trophy",x_trophy, y_trophy,10.5,drawing,rotation=rotation)
-    text_align("awarded to", x_awarded, y_awarded,7, drawing,rotation=rotation)
-    text_align(name.upper(), x_name,y_name,4.5,drawing, style = 'STANDARD',rotation=rotation)
-    text_align(str(year), x_year, y_year,6, drawing,rotation=rotation)
+    text_align("School", x_school, y_school, 10.5, drawing, rotation=rotation)
+    text_align("Trophy",x_trophy, y_trophy, 10.5, drawing, rotation=rotation)
+    text_align("awarded to", x_awarded, y_awarded, 7, drawing, rotation=rotation)
+    text_align(name.upper(), x_name,y_name, 4.5, drawing, style='STANDARD', rotation=rotation)
+    text_align(str(year), x_year, y_year, 6, drawing,rotation=rotation)
 
 
-
-
-
-drawing = dxf.drawing()
 ref_points = (generate_ref_point(h1,h2,w))
 
-generate_template(h1,h2,w,drawing)
-filename = None
-counter = 1
-add_school_trophy(ref_points[0], drawing, 'Jack Jianq', 2016, 'down')
-add_school_trophy(ref_points[1], drawing, 'Brendan Qwan', 2016, 'down')
-add_school_trophy(ref_points[2], drawing, 'Widhiwipati Widyatamaka', 2016, 'down')
-add_school_trophy(ref_points[3], drawing, 'Shourov Quazi', 2016, 'down')
 
-add_school_trophy(ref_points[4], drawing, 'Mr. Comben', 2016, 'up')
-add_school_trophy(ref_points[5], drawing, 'Dr. Jaggar', 2016, 'up')
-add_school_trophy(ref_points[6], drawing, 'Ms. Dam', 2016, 'up')
-add_school_trophy(ref_points[7], drawing, 'Mr. Huynh', 2016, 'up')
+def save_file(drawing, filename='output', path = '', start_iter = 1):
+    print('saving')
+    default_iter = start_iter
+    path += filename
+    if path.endswith('.dxf'):
+        path = path[:-4]
+    counter = 0
+    print(path)
+    while True:
 
+        try:
+            if counter > K_MAX_ITER:
+                input("Over 100 trophies generated: Pausing Until Enter Button is pressed. Please empty out "
+                      "the directory/path supplied (%s)" % path)
+                start_iter = default_iter
+            temp = path + str(start_iter) + '.dxf'
+            drawing.saveas(temp)
+            break
+        except PermissionError:
+            start_iter += 1
+            continue
 
-add_school_trophy(ref_points[8], drawing, 'Monster Kid', 2016, 'right')
-add_school_trophy(ref_points[9], drawing, 'Toriel Dreamurr', 2016, 'left')
-
-
-while True:
-
-    filename = 'output' + str(counter) + '.dxf'
-    try:
-        drawing.saveas(filename)
-        break
-    except PermissionError:
-        counter += 1
-        continue
+if os.name == 'nt':
+    pass
 
 
-os.startfile(filename)
-
-with open('logopoints.txt', 'w') as f:
-    for item in file_out:
-        print(str(item[2]) + "{0:.2f}".format(item[0]) + ',' + "{0:.2f}".format(item[1]), file = f)
+def write_points():
+    with open('logopoints.txt', 'w') as f:
+        for iteration, item in enumerate(file_out):
+            if iteration >= 10:
+                return
+            print(str(item[2]), "{0:.2f}".format(item[0]) + ',' + "{0:.2f}".format(item[1]), file = f)
 
 
 # format of this file
@@ -248,3 +220,51 @@ with open('logopoints.txt', 'w') as f:
 # then the rest is in this form x_cord,ycord
 #  Example: 000100,200
 #           180200,300
+
+def read_csv(path, filename='output', outpath='', outline=False):
+    """Reads from a csv, trophifying all of the things"""
+    with open(path) as f:
+        stderr = open('stderr', 'w')
+        reader = csv.reader(f)
+        counter = 0
+        drawing_counter = 0
+        for line in reader:
+            if line[0].startswith('##') or line[1].startswith('##'): # comment line
+                continue
+
+            if len(line) != 2:  # invalid line
+                print(line, 'is invalid')
+                stderr.write(' '.join(line))
+
+            else:
+                print(counter)
+                name, year = line
+
+                if counter == 0:
+                    _drawing = dxf.drawing()
+                    drawing_counter += 1
+                    if outline:
+                        generate_template(h1,h2,w,_drawing)
+
+                if counter <= 3:  # trophies on the left, pointing down
+                    add_school_trophy(ref_points[counter], _drawing, name, year, 'down')
+
+                elif counter <= 7:
+                    add_school_trophy(ref_points[counter], _drawing, name, year, 'up')
+
+                elif counter == 8:
+                    add_school_trophy(ref_points[counter], _drawing, name, year, 'right')
+
+                elif counter == 9:
+                    add_school_trophy(ref_points[counter], _drawing, name, year, 'left')
+                    counter = -1
+                    save_file(_drawing, filename, outpath, drawing_counter)
+
+                counter += 1
+        if counter != 0:
+            save_file(_drawing, filename, outpath, drawing_counter)
+        stderr.close()
+        write_points()
+
+file = 'in.csv'
+
