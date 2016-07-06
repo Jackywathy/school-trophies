@@ -3,6 +3,7 @@ import dxfwrite
 from dxfwrite import DXFEngine as dxf
 import os
 import csv
+import sys
 K_MAX_ITER = 100
 __author__ = 'Shovel, Jack, and Archie @sydneyboyshigh.com All Rights Unreserved'
 __version__ = 'Pre-Alpha 1.1'
@@ -19,15 +20,6 @@ file_out = []
 # crest = 40, 50
 logo_width = float(40)
 logo_height = float(120)
-
-
-drawing1 = dxf.drawing("template.dxf")
-drawing_trophy = dxf.drawing('Trophy.dxf')
-drawing1.add_layer('LINES')
-drawing1.add(dxf.line((0, 0), (600,0), color=255, layer='LINES', thickness=0.00))
-drawing1.add(dxf.line((600, 0), (600,450), color=255, layer='LINES', thickness=0.00))
-drawing1.add(dxf.line((600,450), (0,450), color=255, layer='LINES', thickness=0.00))
-drawing1.add(dxf.line((0,450), (0,0), color=255, layer='LINES', thickness=0.00))
 
 # sum constants
 crest_y = 129
@@ -90,7 +82,6 @@ def generate_template(h1,h2,w,drawing):
     draw(x,y,x-w,y,drawing)
     draw(x-w,y,x-w,y-h2,drawing)
     draw(x-w,y-h2,x,y-h1,drawing)
-    drawing.save()
 
 
 def draw(x,y,x1,x2,d):
@@ -105,7 +96,6 @@ def text_align(text, x_align, y_align, height, d ,style= "TIMES_ITALIC",rotation
 
 
 def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
-    print(name,year, long_side_dir)
     x_r, y_r = ref_point
     if long_side_dir == 'down':
         # long side is down!
@@ -165,7 +155,8 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
 
     if len(name) > 23:
         print("Name must be shorter than 23 letters! Skipping", (name, year, ref_point))
-        return "Name must be shorter than 23 letters! Skipping", (name, year, ref_point)
+        with open('stderr.txt', 'a') as f:
+            print("Name must be shorter than 23 letters! Skipping", (name, year, ref_point), file=f)
 
     text_align('Sydney Boys High School', x_sbhs, y_sbhs, 4.7, drawing,rotation=rotation)
     text_align('Student Award Scheme', x_sac, y_sac, 5.7,drawing, rotation=rotation)
@@ -181,13 +172,11 @@ ref_points = (generate_ref_point(h1,h2,w))
 
 
 def save_file(drawing, filename='output', path = '', start_iter = 1):
-    print('saving')
     default_iter = start_iter
     path += filename
     if path.endswith('.dxf'):
         path = path[:-4]
     counter = 0
-    print(path)
     while True:
 
         try:
@@ -201,10 +190,6 @@ def save_file(drawing, filename='output', path = '', start_iter = 1):
         except PermissionError:
             start_iter += 1
             continue
-
-if os.name == 'nt':
-    pass
-
 
 def write_points():
     with open('logopoints.txt', 'w') as f:
@@ -221,50 +206,103 @@ def write_points():
 #  Example: 000100,200
 #           180200,300
 
-def read_csv(path, filename='output', outpath='', outline=False):
+def read_csv(path, filename='output', outpath='', outline=False, logopoints=False):
     """Reads from a csv, trophifying all of the things"""
     with open(path) as f:
-        stderr = open('stderr', 'w')
-        reader = csv.reader(f)
-        counter = 0
-        drawing_counter = 0
-        for line in reader:
-            if line[0].startswith('##') or line[1].startswith('##'): # comment line
-                continue
+        with open('stderr.txt', 'a') as stderr:
+            reader = csv.reader(f)
+            counter = 0
+            drawing_counter = 0
+            for iteration, line in enumerate(reader):
+                if line[0].startswith('##') or line[1].startswith('##'): # comment line
+                    continue
 
-            if len(line) != 2:  # invalid line
-                print(line, 'is invalid')
-                stderr.write(' '.join(line))
+                if len(line) != 2:  # invalid line
+                    stderr.write(' '.join(line) + 'Line %d' % iteration+1)
+                    print("Error happened on line %d" % iteration+1)
 
-            else:
-                print(counter)
-                name, year = line
+                else:
+                    name, year = line
 
-                if counter == 0:
-                    _drawing = dxf.drawing()
-                    drawing_counter += 1
-                    if outline:
-                        generate_template(h1,h2,w,_drawing)
+                    if counter == 0:
+                        _drawing = dxf.drawing()
+                        drawing_counter += 1
+                        if outline:
+                            generate_template(h1,h2,w,_drawing)
 
-                if counter <= 3:  # trophies on the left, pointing down
-                    add_school_trophy(ref_points[counter], _drawing, name, year, 'down')
+                    if counter <= 3:  # trophies on the left, pointing down
+                        add_school_trophy(ref_points[counter], _drawing, name, year, 'down')
 
-                elif counter <= 7:
-                    add_school_trophy(ref_points[counter], _drawing, name, year, 'up')
+                    elif counter <= 7:
+                        add_school_trophy(ref_points[counter], _drawing, name, year, 'up')
 
-                elif counter == 8:
-                    add_school_trophy(ref_points[counter], _drawing, name, year, 'right')
+                    elif counter == 8:
+                        add_school_trophy(ref_points[counter], _drawing, name, year, 'right')
 
-                elif counter == 9:
-                    add_school_trophy(ref_points[counter], _drawing, name, year, 'left')
-                    counter = -1
-                    save_file(_drawing, filename, outpath, drawing_counter)
+                    elif counter == 9:
+                        add_school_trophy(ref_points[counter], _drawing, name, year, 'left')
+                        counter = -1
+                        save_file(_drawing, filename, outpath, drawing_counter)
 
-                counter += 1
-        if counter != 0:
-            save_file(_drawing, filename, outpath, drawing_counter)
-        stderr.close()
-        write_points()
+                    counter += 1
+            if counter != 0:
+                save_file(_drawing, filename, outpath, drawing_counter)
+            if logopoints:
+                write_points()
 
 file = 'in.csv'
+
+
+
+
+
+def main():
+    arg_outline = False
+    arg_gen_points = False
+
+    if len(sys.argv) > 1:
+        # there are arguments
+        if sys.argv[1] == '--help':
+            print("OPTIONS")
+            print("%-30s %s" %("\t--outline", "Draw a outline around the trophy"))
+            print("%-30s %s" %("\t--interact", "Enable interactive input, saving as a csv when done"))
+            print("%-30s %s" % ("\t--gen-points", "Also generate a logopoints.txt for usage in LISP"))
+            sys.exit(0)
+
+        for i in sys.argv[1:]:
+            if i.startswith('--'):
+                if i == '--outline': # makes the outline!
+                    arg_outline = True
+                elif i == '--interact': # allows interative input: TODO FINISH!
+                    ...
+                elif i == '--gen-points': # generate a logopoints.txt
+                    arg_gen_points = True
+
+                else:
+                    print(i, "is an invalid option")
+                    sys.exit(-1)
+
+            else:
+                # must be CSV path
+                if os.path.exists(i):
+                    read_csv(i, outline=arg_outline, logopoints=arg_gen_points)
+                    sys.exit(0)
+                else:
+                    print("csv cannot be found")
+                    sys.exit(-2)
+
+        print("No csv file specified")
+        sys.exit(1)
+
+
+
+
+
+
+    else:
+        print("Usage: %s [OPTIONS] CSV" % sys.argv[0])
+        print('Type %s --help to see options' % sys.argv[0])
+
+if __name__ == "__main__":
+    main()
 
