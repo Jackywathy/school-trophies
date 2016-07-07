@@ -250,12 +250,6 @@ def read_csv(path, filename='output', outpath='', outline=False, logopoints=Fals
             if logopoints:
                 write_points()
 
-file = 'in.csv'
-
-
-
-
-
 def main():
     arg_outline = False
     arg_gen_points = False
@@ -270,12 +264,27 @@ def main():
             sys.exit(0)
 
         for i in sys.argv[1:]:
-            if i.startswith('--'):
-                if i == '--outline': # makes the outline!
+            if i.startswith('--') or i.startswith('-'):
+                if i == '--outline' or i == '-outline': # makes the outline!
                     arg_outline = True
-                elif i == '--interact': # allows interative input: TODO FINISH!
-                    ...
-                elif i == '--gen-points': # generate a logopoints.txt
+                elif i == '--interact' or i == '-interact': # allows interative input: TODO FINISH!
+                    filepath = input("Enter new csv file path (default temp.csv): ")
+                    if not filepath:
+                        filepath = 'temp.csv'
+
+                    with open(filepath, 'w',encoding='utf8') as f:
+                        csvfile = csv.writer(f)
+                        line = input("Enter name and year seperated by commas: ")
+                        while line:
+                            if len(line.split(',')) == 2:
+                                print(line.split(','))
+                                csvfile.writerow(line.split(','))
+
+                            else:
+                                print("Invalid input")
+                            line = input("Enter name and year seperated by commas: ")
+
+                elif i == '--gen-points' or i == '-gen-points': # generate a logopoints.txt
                     arg_gen_points = True
 
                 else:
