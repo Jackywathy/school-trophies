@@ -305,9 +305,6 @@ def main():
 
 
 
-
-
-
     else:
         print("Usage: %s [OPTIONS] CSV" % sys.argv[0])
         print('Type %s --help to see options' % sys.argv[0])
