@@ -5,6 +5,8 @@ import os
 import csv
 import sys
 K_MAX_ITER = 100
+K_NAME = 'Trophy'
+
 __author__ = 'Shovel, Jack, and Archie @sydneyboyshigh.com All Rights Unreserved'
 __version__ = 'Pre-Alpha 1.1'
 
@@ -253,39 +255,50 @@ def read_csv(path, filename='output', outpath='', outline=False, logopoints=Fals
 def main():
     arg_outline = False
     arg_gen_points = False
+    arg_delete_csv = False
 
     if len(sys.argv) > 1:
         # there are arguments
-        if sys.argv[1] == '--help':
-            print("OPTIONS")
+        if sys.argv[1] == '--help' or sys.argv[1] == '-help':
+            print("USAGE:")
+            print("%-30s" % ('\t' + str(K_NAME) + ' [OPTIONS] CSV\n'))
+
+            print("OPTIONS: (-- and - can be used)")
             print("%-30s %s" %("\t--outline", "Draw a outline around the trophy"))
-            print("%-30s %s" %("\t--interact", "Enable interactive input, saving as a csv when done"))
+            print("%-30s %s" %("\t--interact", "Enable interactive input with automatic formatting, saving as a csv when done"))
+            print("%-30s %s" % ("\t--interact-noformat", "Enable interactive input, saving as a csv when done, without automatic formatting"))
             print("%-30s %s" % ("\t--gen-points", "Also generate a logopoints.txt for usage in LISP"))
+            print("%-30s %s" % ("\t--delete-csv", "Deletes the csv file after successful reading"))
             sys.exit(0)
 
         for i in sys.argv[1:]:
+            print(i)
             if i.startswith('--') or i.startswith('-'):
-                if i == '--outline' or i == '-outline': # makes the outline!
+                if i == '--outline' or i == '-outline':  # makes the outline!
                     arg_outline = True
                 elif i == '--interact' or i == '-interact': # allows interative input: TODO FINISH!
                     filepath = input("Enter new csv file path (default temp.csv): ")
                     if not filepath:
                         filepath = 'temp.csv'
 
-                    with open(filepath, 'w',encoding='utf8') as f:
+                    with open(filepath, 'w',encoding='utf8',newline='') as f:
                         csvfile = csv.writer(f)
                         line = input("Enter name and year seperated by commas: ")
                         while line:
                             if len(line.split(',')) == 2:
-                                print(line.split(','))
-                                csvfile.writerow(line.split(','))
+                                line = line.replace('\n', '').split(',')
+                                csvfile.writerow([' '.join(line[0].title().lstrip().rstrip().split()), line[1].replace(' ', '')])
 
                             else:
                                 print("Invalid input")
                             line = input("Enter name and year seperated by commas: ")
+                        sys.argv.append(filepath)
 
                 elif i == '--gen-points' or i == '-gen-points': # generate a logopoints.txt
                     arg_gen_points = True
+
+                elif i == '--delete-csv' or i == '-delete-csv':  # delete csv file
+                    arg_delete_csv = True
 
                 else:
                     print(i, "is an invalid option")
@@ -295,7 +308,12 @@ def main():
                 # must be CSV path
                 if os.path.exists(i):
                     read_csv(i, outline=arg_outline, logopoints=arg_gen_points)
+                    print(sys.path)
+                    if arg_delete_csv:
+                        os.remove(i)
+
                     sys.exit(0)
+
                 else:
                     print("csv cannot be found")
                     sys.exit(-2)
@@ -306,8 +324,8 @@ def main():
 
 
     else:
-        print("Usage: %s [OPTIONS] CSV" % sys.argv[0])
-        print('Type %s --help to see options' % sys.argv[0])
+        print("Usage: %s [OPTIONS] CSV" % K_NAME)
+        print('Type %s --help to see options' % K_NAME)
 
 if __name__ == "__main__":
     main()
