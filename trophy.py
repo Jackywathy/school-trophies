@@ -4,26 +4,24 @@ from dxfwrite import DXFEngine as dxf
 import os
 import csv
 import sys
+
 K_MAX_ITER = 100
 K_NAME = 'Trophy'
 
 __author__ = 'Shovel, Jack, and Archie @sydneyboyshigh.com All Rights Unreserved'
-__version__ = 'Pre-Alpha 1.1'
+__version__ = 'Beta 1.2'
 
-h1=155.5 ################
-h2= 225 ################
-w = 90.4 #################
-mid_trophy = 45
-black = 250
+h1=155.5 
+h2= 225 
+w = 90.4 
+BLACK = 250
 
 file_out = []
-# 130, 25 = school trophy insertion point
-# the bottom left corner of the trophy from the bottom left of a trophy. TODO PROPERLY FINISH THESE VARS?
-# crest = 40, 50
 logo_width = float(40)
 logo_height = float(120)
 
 # sum constants
+mid_trophy = 45
 crest_y = 129
 sbhs_y = 120 # sydney boys high
 sac_y = 110   # student award scheme
@@ -34,8 +32,16 @@ awarded_y = 44.5
 name_y = 34.5
 year_y = 24
 
+#
+# Trophy parts are inserted with the midpint being (mid_trophy)
+# and the y points being these constants
+#
 
 def generate_ref_point(h1,h2,w):
+    """
+    Shovel's reference point generator: returns a list of 10 reference points
+    that each should be the bottom left corner of a trophy
+    """
     ref = []
     xgap = (600-(h1+h2+w))/4
     ygap1 = (450-(4*w))/5
@@ -90,7 +96,7 @@ def draw(x,y,x1,x2,d):
     d.add(dxf.line((x,y),(x1,x2),color=1, layer='LINES',thickness=0.01))
 
 
-def text_align(text, x_align, y_align, height, d ,style= "TIMES_ITALIC",rotation=0, color = 250):
+def text_align(text, x_align, y_align, height, d ,style= "TIMES_ITALIC",rotation=0, color=BLACK):
     """Creates text with the middle aligned to x_al. and y_al."""
     text = dxf.text(text, height = height,mirror=dxfwrite.MIRROR_X,halign=CENTER, alignpoint = (x_align,y_align),
                     style=style, layer='LINES', rotation=rotation, color=color, linetype='ByBlock')
@@ -141,6 +147,7 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         x_year, y_year= mid_trophy + x_r, y_r + year_y
 
     elif long_side_dir == 'left':
+        # if it is backwards
         rotation = 180
         file_out.append((x_r-mid_trophy, y_r - crest_y, '180'))
         x_sbhs,y_sbhs = x_r-mid_trophy, y_r  - sbhs_y
@@ -153,14 +160,14 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         x_year, y_year = x_r-mid_trophy, y_r - year_y
 
     else:
-        raise BaseException('long side direction must be down, up, right or left')
+        raise ValueError('long side direction must be down, up, right or left')
 
     if len(name) > 23:
         print("Name must be shorter than 23 letters! Skipping", (name, year, ref_point))
         with open('stderr.txt', 'a') as f:
             print("Name must be shorter than 23 letters! Skipping", (name, year, ref_point), file=f)
 
-    text_align('Sydney Boys High School', x_sbhs, y_sbhs, 4.7, drawing,rotation=rotation)
+    text_align('Sydney Boys High School', x_sbhs, y_sbhs, 4.7, drawing, rotation=rotation)
     text_align('Student Award Scheme', x_sac, y_sac, 5.7,drawing, rotation=rotation)
     text_align("The", x_the, y_the, 10.5, drawing, rotation=rotation)
     text_align("School", x_school, y_school, 10.5, drawing, rotation=rotation)
@@ -168,8 +175,7 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
     text_align("awarded to", x_awarded, y_awarded, 7, drawing, rotation=rotation)
     text_align(name.upper(), x_name,y_name, 4.5, drawing, style='STANDARD', rotation=rotation)
     text_align(str(year), x_year, y_year, 6, drawing,rotation=rotation)
-
-
+    
 ref_points = (generate_ref_point(h1,h2,w))
 
 
@@ -192,6 +198,7 @@ def save_file(drawing, filename='output', path = '', start_iter = 1):
         except PermissionError:
             start_iter += 1
             continue
+        
 
 def write_points():
     with open('logopoints.txt', 'w') as f:
@@ -200,14 +207,14 @@ def write_points():
                 return
             print(str(item[2]), "{0:.2f}".format(item[0]) + ',' + "{0:.2f}".format(item[1]), file = f)
 
-
 # format of this file
-
+#
 # first three letters are 000, 090, 180, 270, sepecifying the rotation
 # then the rest is in this form x_cord,ycord
-#  Example: 000100,200
-#           180200,300
-
+#  Example: 000 100,200
+#           180 200,300
+# this file only needs to be generated once, and placed in autocad support pat
+#
 def read_csv(path, filename='output', outpath='', outline=False, logopoints=False):
     """Reads from a csv, trophifying all of the things"""
     with open(path) as f:
@@ -251,6 +258,7 @@ def read_csv(path, filename='output', outpath='', outline=False, logopoints=Fals
                 save_file(_drawing, filename, outpath, drawing_counter)
             if logopoints:
                 write_points()
+
 
 def main():
     arg_outline = False
