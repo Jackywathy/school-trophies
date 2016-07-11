@@ -184,20 +184,21 @@ def save_file(drawing, filename='output', path = '', start_iter = 1):
     path += filename
     if path.endswith('.dxf'):
         path = path[:-4]
-    counter = 0
-    while True:
-
-        try:
-            if counter > K_MAX_ITER:
-                input("Over 100 trophies generated: Pausing Until Enter Button is pressed. Please empty out "
-                      "the directory/path supplied (%s)" % path)
+    if os.path.exists(os.path.expanduser(path)+'.dxf'):
+        while True:
+            if start_iter > K_MAX_ITER:
+                input("Over 100 trophies generated: Pausing until RETURN is pressed. Please empty out "
+                        "the directory/path (%s)" % path)
                 start_iter = default_iter
-            temp = path + str(start_iter) + '.dxf'
-            drawing.saveas(temp)
-            break
-        except PermissionError:
-            start_iter += 1
-            continue
+            temp = path + '_' + str(start_iter) + '.dxf'
+            if not os.path.exists(os.path.expanduser(temp)):
+                drawing.saveas(os.path.expanduser(temp))
+                break
+            else:
+                start_iter += 1
+
+    else:
+        drawing.saveas(os.path.expanduser(path)+'.dxf')
         
 
 def write_points():
@@ -215,10 +216,12 @@ def write_points():
 #           180 200,300
 # this file only needs to be generated once, and placed in autocad support pat
 #
+
+
 def read_csv(path, filename='output', outpath='', outline=False, logopoints=False):
     """Reads from a csv, trophifying all of the things"""
-    with open(path) as f:
-        with open('stderr.txt', 'a') as stderr:
+    try:
+        with open(os.path.expanduser(path)) as f:
             reader = csv.reader(f)
             counter = 0
             drawing_counter = 0
@@ -227,8 +230,9 @@ def read_csv(path, filename='output', outpath='', outline=False, logopoints=Fals
                     continue
 
                 if len(line) != 2:  # invalid line
-                    stderr.write(' '.join(line) + 'Line %d' % iteration+1)
-                    print("Error happened on line %d" % iteration+1)
+                    with open('stderr.txt', 'a') as stderr:
+                        stderr.write(' '.join(line) + 'Line %d' % iteration+1)
+                    print("Line %d is invalid [%s]" % (iteration+1, line))
 
                 else:
                     name, year = line
@@ -258,18 +262,25 @@ def read_csv(path, filename='output', outpath='', outline=False, logopoints=Fals
                 save_file(_drawing, filename, outpath, drawing_counter)
             if logopoints:
                 write_points()
+    except FileNotFoundError:
+        print("file '%s' not found! Aborting"% path)
+        sys.exit(-4)
 
 
 def main():
     arg_outline = False
     arg_gen_points = False
     arg_delete_csv = False
+    arg_filename = 'output'
 
     if len(sys.argv) > 1:
+
         # there are arguments
         if sys.argv[1] == '--help' or sys.argv[1] == '-help':
             print("USAGE:")
-            print("%-30s" % ('\t' + str(K_NAME) + ' [OPTIONS] CSV\n'))
+            print("%-30s" % ('\t' + str(K_NAME) + ' [OPTIONS] (CSV)'))
+            print("\tCSV - Path to CSV file")
+            print('\n')
 
             print("OPTIONS: (-- and - can be used)")
             print("%-30s %s" %("\t--outline", "Draw a outline around the trophy"))
@@ -277,21 +288,26 @@ def main():
             print("%-30s %s" % ("\t--interact-noformat", "Enable interactive input, saving as a csv when done, without automatic formatting"))
             print("%-30s %s" % ("\t--gen-points", "Also generate a logopoints.txt for usage in LISP"))
             print("%-30s %s" % ("\t--delete-csv", "Deletes the csv file after successful reading"))
-            sys.exit(0)
+            print("%-30s %s" % ("\t--filename (filename)", "Name the output files"))
 
-        for i in sys.argv[1:]:
-            print(i)
+            sys.exit(0)
+        sys.argv.pop(0)
+        while sys.argv:
+            i = sys.argv.pop(0)
+
             if i.startswith('--') or i.startswith('-'):
                 if i == '--outline' or i == '-outline':  # makes the outline!
                     arg_outline = True
-                elif i == '--interact' or i == '-interact': # allows interative input: TODO FINISH!
+
+                elif i == '--interact' or i == '-interact': # allows interative input:
                     filepath = input("Enter new csv file path (default temp.csv): ")
                     if not filepath:
                         filepath = 'temp.csv'
+                    print("Enter name and year seperated by commas: ")
 
                     with open(filepath, 'w',encoding='utf8',newline='') as f:
                         csvfile = csv.writer(f)
-                        line = input("Enter name and year seperated by commas: ")
+                        line = input(">> ")
                         while line:
                             if len(line.split(',')) == 2:
                                 line = line.replace('\n', '').split(',')
@@ -299,8 +315,8 @@ def main():
 
                             else:
                                 print("Invalid input")
-                            line = input("Enter name and year seperated by commas: ")
-                        sys.argv.append(filepath)
+                            line = input(">> ")
+                    sys.argv.append(filepath)
 
                 elif i == '--gen-points' or i == '-gen-points': # generate a logopoints.txt
                     arg_gen_points = True
@@ -308,29 +324,38 @@ def main():
                 elif i == '--delete-csv' or i == '-delete-csv':  # delete csv file
                     arg_delete_csv = True
 
+                elif i == '--filename' or i == '-filename':
+                    if arg_filename != 'output':
+                        print("Duplicate --filename option")
+                        sys.exit(-1)
+                    arg_filename = sys.argv.pop(0)
+
+
                 else:
                     print(i, "is an invalid option")
                     sys.exit(-1)
 
             else:
-                # must be CSV path
-                if os.path.exists(i):
-                    read_csv(i, outline=arg_outline, logopoints=arg_gen_points)
-                    print(sys.path)
+                # must be CSV path -- if override is speciifed then use the overide
+
+                print("Reading from '%s'" % i)
+                if os.path.exists(os.path.expanduser(i)):
+                    read_csv(i, outline=arg_outline, logopoints=arg_gen_points, filename=arg_filename)
                     if arg_delete_csv:
                         os.remove(i)
-
                     sys.exit(0)
 
                 else:
-                    print("csv cannot be found")
+                    print("CSV cannot be found")
                     sys.exit(-2)
 
+        # sys.argv finished reading without hitting a csv file at the end
+
         print("No csv file specified")
-        sys.exit(1)
+        sys.exit(-3)
 
 
-
+    # no options at all
     else:
         print("Usage: %s [OPTIONS] CSV" % K_NAME)
         print('Type %s --help to see options' % K_NAME)
@@ -338,3 +363,8 @@ def main():
 if __name__ == "__main__":
     main()
 
+#EXIT CODES
+# 0 = NORMAL
+# -1 = invalid options
+# -2 = cannot find csv file
+# -3 = no csv file specified
