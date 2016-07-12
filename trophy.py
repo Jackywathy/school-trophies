@@ -289,9 +289,9 @@ def main():
             print("%-30s %s" % ("\t--gen-points", "Also generate a logopoints.txt for usage in LISP"))
             print("%-30s %s" % ("\t--delete-csv", "Deletes the csv file after successful reading"))
             print("%-30s %s" % ("\t--filename (filename)", "Name the output files"))
-
             sys.exit(0)
         sys.argv.pop(0)
+
         while sys.argv:
             i = sys.argv.pop(0)
 
