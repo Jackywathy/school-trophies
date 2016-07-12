@@ -63,6 +63,9 @@ def generate_ref_point(h1,h2,w):
 
 
 def generate_template(h1,h2,w,drawing):
+    """
+    Generates a outline around all the tropies on the drawing given. (c) shovel
+    """
     drawing.add(dxf.line((0, 0), (600,0), color=255, layer='LINES', thickness=0.00))
     drawing.add(dxf.line((600, 0), (600,450), color=255, layer='LINES', thickness=0.00))
     drawing.add(dxf.line((600,450), (0,450), color=255, layer='LINES', thickness=0.00))
@@ -92,8 +95,10 @@ def generate_template(h1,h2,w,drawing):
     draw(x-w,y-h2,x,y-h1,drawing)
 
 
-def draw(x,y,x1,x2,d):
-    d.add(dxf.line((x,y),(x1,x2),color=1, layer='LINES',thickness=0.01))
+def draw(x,y,x1,y1,d):
+    """Draws a line from (x,y) to (x1,y1) on drawing d"""
+    assert(type(d) == dxfwrite.drawing.Drawing)     
+    d.add(dxf.line((x,y),(x1,y1),color=1, layer='LINES',thickness=0.01))
 
 
 def text_align(text, x_align, y_align, height, d ,style= "TIMES_ITALIC",rotation=0, color=BLACK):
