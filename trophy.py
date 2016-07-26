@@ -272,13 +272,14 @@ def read_csv(path, filename='output', outpath='', outline=False, logopoints=Fals
         sys.exit(-4)
 
 
-def main():
+def main(argv):
     arg_outline = False
     arg_gen_points = False
     arg_delete_csv = False
     arg_filename = 'output'
+    arg_fileout = None
 
-    if len(sys.argv) > 1:
+    if len(argv) > 1:
 
         # there are arguments
         if sys.argv[1] == '--help' or sys.argv[1] == '-help':
@@ -294,11 +295,12 @@ def main():
             print("%-30s %s" % ("\t--gen-points", "Also generate a logopoints.txt for usage in LISP"))
             print("%-30s %s" % ("\t--delete-csv", "Deletes the csv file after successful reading"))
             print("%-30s %s" % ("\t--filename (filename)", "Name the output files"))
+            print("%-30s %s" % ("\t--fileout (filepath)", "Directory where output is sent"))
             sys.exit(0)
-        sys.argv.pop(0)
+        argv.pop(0)
 
-        while sys.argv:
-            i = sys.argv.pop(0)
+        while argv:
+            i = argv.pop(0)
 
             if i.startswith('--') or i.startswith('-'):
                 if i == '--outline' or i == '-outline':  # makes the outline!
@@ -321,7 +323,7 @@ def main():
                             else:
                                 print("Invalid input")
                             line = input(">> ")
-                    sys.argv.append(filepath)
+                    argv.append(filepath)
 
                 elif i == '--gen-points' or i == '-gen-points': # generate a logopoints.txt
                     arg_gen_points = True
@@ -333,7 +335,13 @@ def main():
                     if arg_filename != 'output':
                         print("Duplicate --filename option")
                         sys.exit(-1)
-                    arg_filename = sys.argv.pop(0)
+                    arg_filename = argv.pop(0)
+
+                elif i == '--fileout' or i == '-fileout':
+                    if arg_fileout:
+                        print("Duplicate --fileout option")
+                        sys.exit(-1)
+                    arg_fileout = argv.pop(0)
 
 
                 else:
@@ -366,7 +374,7 @@ def main():
         print('Type %s --help to see options' % K_NAME)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
 
 #EXIT CODES
 # 0 = NORMAL
