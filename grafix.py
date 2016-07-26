@@ -11,11 +11,13 @@ class Application:
         self.root.bind("<Button-1>", self.callback)
 
         self.root.wm_title("Trophy Creator \u0254\u20DD Forge")
-        self.root.iconbitmap('ico.ico')
+        self.root.iconbitmap('icon.ico')
 
         # windows only setup
-        if system() == "Windows"or 1:
+        if system() == "Windows":
             self.setupWin()
+        elif system() == "Darwin":
+            self.setupMac()
 
         # spare
         self.csvFile = StringVar()
@@ -26,6 +28,7 @@ class Application:
         self.create_frames()
 
         self.root.update()
+
 
 
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
@@ -42,13 +45,13 @@ class Application:
         self.csvIn = Entry(self.csvFrame)
         self.csvIn.bind("<Return>", self.getCsvText)
 
-        self.csvSelected = Label(self.csvText.pack(), textvariable=self.csvFile)
 
+        self.csvSelected = Label(self.csvFrame, textvariable=self.csvFile)
 
-        self.csvText.pack()
-        self.csvBrowse.pack()
-        self.csvIn.pack()
-        self.csvSelected.pack()
+        self.csvText.grid(row=0,columnspan=2)
+        self.csvIn.grid(row=1,column=0)
+        self.csvBrowse.grid(row=1,column=1)
+        self.csvSelected.grid(row=2,columnspan=2)
 
         ####### Options-
 
@@ -82,11 +85,11 @@ class Application:
         self.outputLabel.grid(row=1)
 
 
+        self.csvFrame.pack()
 
-        self.csvFrame.pack()
-        self.csvFrame.pack()
         self.optionFrame.pack()
 
+        self.outputFrame.pack()
 
 
 
@@ -121,7 +124,10 @@ class Application:
         trophy.main(list(self.arguments).append(self.csvFile.get()))
 
     def setupWin(self):
-        self.root.wm_iconbitmap('ico.ico')
+        self.root.wm_iconbitmap(default='icon.ico')
+    def setupMac(self):
+        self.root.wm_iconbitmap(bitmap='icon.ico')
+
 
 
 Application()
