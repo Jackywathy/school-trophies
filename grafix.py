@@ -153,8 +153,8 @@ class Application:
     def getOutputFile(self, *args):
         if self.csvFile.get():
             self.outputFile = asksaveasfilename(defaultextension='.dxf')
-            templist = ['popped'] + list(self.arguments) + ['--filename', self.outputFile] + [self.csvFile.get()]
-            print(templist)
+            templist = ['popped'] + list(self.arguments) + ['--filename', 'lol filename doesnt work yet' + [self.csvFile.get()]
+            
         else:
             message.showwarning(title='spam', message='Select a .csv file first!')
 
