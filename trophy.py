@@ -282,7 +282,7 @@ def main(argv):
     if len(argv) > 1:
 
         # there are arguments
-        if sys.argv[1] == '--help' or sys.argv[1] == '-help':
+        if argv[1] == '--help' or argv[1] == '-help':
             print("USAGE:")
             print("%-30s" % ('\t' + str(K_NAME) + ' [OPTIONS] (CSV)'))
             print("\tCSV - Path to CSV file")
