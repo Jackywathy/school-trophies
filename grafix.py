@@ -154,6 +154,7 @@ class Application:
         if self.csvFile.get():
             self.outputFile = asksaveasfilename(defaultextension='.dxf')
             templist = ['popped'] + list(self.arguments) + ['--filename', 'lol filename doesnt work yet' + [self.csvFile.get()]
+            trophy.main(templist)
             
         else:
             message.showwarning(title='spam', message='Select a .csv file first!')
