@@ -1,17 +1,40 @@
 from tkinter import *
 from tkinter.filedialog import *
 import tkinter.ttk as ttk
+import tkinter.messagebox as message
 from platform import system
 import trophy
+import string
+import sys
+counter = 0
+alpha = string.ascii_letters * 10
+
+LIMIT = 28 # limit of string
+
+WINDOWS = 'win'
+ELSE = 'lin'
+
+
 
 class Application:
+    def quit(self, *args):
+        self.tk.quit()
+        sys.exit()
+    def fill_file(self, *args):
+        global counter; counter += 1
+        self.csvIn.delete(0, END)
+        self.csvIn.insert(0,alpha[:counter])
+        sys.stdout.write(str(counter) + '\n')
+        sys.stdout.flush()
+
     def __init__(self):
         self.arguments = set()
         self.tk = Tk()
-        self.tk.bind("<Button-1>", self.callback)
-        self.notebook = ttk.Notebook(self.tk)
+        self.tk.bind("<Escape>", self.quit)
 
-        self.photo = PhotoImage(file='icon.ico')
+        self.notebookFrame = Frame(self.tk, width=100, padx=60)
+        self.notebook = ttk.Notebook(self.notebookFrame)
+
 
         self.tk.wm_title("Trophy Creator \u0254\u20DD Forge")
         self.tk.iconbitmap('icon.ico')
@@ -19,12 +42,14 @@ class Application:
         # windows only setup
         if system() == "Windows":
             self.setupWin()
+            self.os = WINDOWS
         elif system() == "Darwin":
             self.setupMac()
+            self.os = ELSE
 
         # spare
         self.csvFile = StringVar()
-        self.output = StringVar()
+        self.outputFile = StringVar()
 
 
         # create grafix
@@ -39,30 +64,33 @@ class Application:
 
     def create_frames(self):
 
-        self.page1 = ttk.Frame()
-        self.page2 = ttk.Frame()
+        # frames
+        self.page1 = ttk.Frame(self.tk)
+        self.page2 = ttk.Frame(self.tk)
+        self.csvAndOK = Frame(self.tk)
+        self.csvFrame = LabelFrame(self.csvAndOK,text="CSV In", width=100, height=100)
+        self.outputFrame = LabelFrame(self.tk, text='Output', width=100)
+        self.optionFrame = Frame(self.page1, width=100)
 
-        self.csvFrame = Frame(self.page1)
-        self.csvText = Label(self.csvFrame, text="Enter the CSV file")
-        self.csvBrowse = Button(self.csvFrame,command = self.getFile, text="Browse")
-        self.csvIn = Entry(self.csvFrame)
+        self.csvFrame.grid(row=0,column=0,columnspan=3)
+
+
+        self.okButton = Button(self.csvAndOK, text="OK",command=self.getOutputFile)
+        self.okButton.grid(row=0,column=4)
+        # csv frame- tis should be but on the very top, above the notebook
+        self.csvText = Label(self.csvFrame, text="File Path", anchor=W)
+        self.csvBrowse = Button(self.csvFrame,command = self.getCsvFile, text="Browse")
+        self.csvIn = Entry(self.csvFrame, width=35)
         self.csvIn.bind("<Return>", self.getCsvText)
 
-        self.csvSelected = Label(self.csvFrame, textvariable=self.csvFile)
-        self.csvSeperator = ttk.Separator(self.page1, orient=HORIZONTAL)
-
-        self.csvText.grid(row=0,columnspan=2)
-        self.csvIn.grid(row=1,column=0)
-        self.csvBrowse.grid(row=1,column=1)
-        self.csvSelected.grid(row=2,columnspan=2)
+        self.csvText.grid(row=0,column=0)
+        self.csvIn.grid(row=0,column=1,columnspan=2)
+        self.csvBrowse.grid(row=0,column=4)
 
 
 
 
         ####### Options-
-
-        self.optionFrame = Frame(self.page1)
-        self.optionLabel = Label(self.optionFrame, text="Standard Options")
         out_temp = BooleanVar()
         delete_temp = BooleanVar()
         self.outLine = Checkbutton(self.optionFrame,text='Outline', variable=out_temp)
@@ -71,65 +99,72 @@ class Application:
         self.deletecsv = Checkbutton(self.optionFrame, text='Delete csv afterwards?', variable=delete_temp)
         self.deletecsv.var = delete_temp
 
-        self.outLine.grid(row=0, column=0)
-        self.deletecsv.grid(row=0,column=1)
+        self.outLine.grid(row=0, column=0, padx=10,pady=5)
+        self.deletecsv.grid(row=0,column=1, padx=10,pady=5)
 
 
 
-
-        ### Output location & button
-
-        self.outputFrame = Frame(self.page1)
-
-        self.outputEntry = Entry(self.outputFrame,text="Enter Output Location: ")
-        self.outputEntry.bind("<Return>", self.getOutputLocation)
-        self.outputEntry.grid(row=0,column=0)
-
-        self.outputBrowse = Button(self.outputFrame,command = self.getOutputFile, text="Browse")
-        self.outputBrowse.grid(row=0,column=1)
-        self.outputLabel = Label(self.outputFrame, textvariable=self.output)
-        self.outputLabel.grid(row=1)
 
         # Page1 Frame Grids'
-        self.csvFrame.grid(row=0,column=0,rowspan=2)
-        self.csvSeperator.grid(row=0,column=1,rowspan=2)
         self.optionFrame.grid(row=0,column=2)
-        self.outputFrame.grid(row=1,column=2)
+
+
 
         # Page2 Frame Grid's
-        self.csvFrame.grid(row=0, column=0, rowspan=2)
 
+        self.notebook.pack(fill=BOTH,expand=1)
 
         self.notebook.add(self.page1, text='Trophy', sticky=E+S)
         self.notebook.add(self.page2, text='Medal', sticky=E+S)
-        self.notebook.pack(anchor=E)
+        # csv INPUT frame
+        self.csvAndOK.pack(fill=BOTH,expand=1,padx=10,pady=5)
+        self.notebookFrame.pack(fill=BOTH,expand=1,padx=10,pady=5,anchor=W)
+        self.outputFrame.pack(fill=BOTH,expand=1,padx=10,pady=5)
 
-
-
-    def getFile(self):
+    def getCsvFile(self):
         self.csvFile.set(askopenfilename())
+        x = self.csvFile.get()
+        try:
+            if not ((x[-4]=='.') and (x[-3]=='c' or x[-3]=='C') and (x[-2]=='s' or x[-2]=='S') and (x[-1]=='v' or x[-1]=='V')):
+                message.showwarning(title='spam',message='The file does not end in .csv')
+
+            else:
+                self.csvIn.delete(0,END)
+                self.csvIn.insert(0,self.csvFile.get())
+        except IndexError:
+            message.showwarning(title='spam',message='The file does not end in .csv')
+
 
     def getCsvText(self, event):
-        self.csvFile.set("../" + self.csvIn.get().split('/')[-1])
+        x = os.path.expanduser(self.csvIn.get())
+        if not os.path.exists(x):
+            message.showwarning(title='spam',message='The file does not exist')
+            # test for existance
+        try: # test for csv fileness
+            if not ((x[-4]=='.') and (x[-3]=='c' or x[-3]=='C') and (x[-2]=='s' or x[-2]=='S') and (x[-1]=='v' or x[-1]=='V')):
+                message.showwarning(title='spam',message='The file does not end in .csv')
+            else:
+                self.csvFile.set(x)
+
+        except IndexError:
+            message.showwarning(title='spam',message='The file does not end in .csv')
 
 
+    def getOutputFile(self, *args):
+        if self.csvFile.get():
+            self.outputFile = asksaveasfilename(defaultextension='.dxf')
+            templist = ['popped'] + list(self.arguments) + ['--filename', self.outputFile] + [self.csvFile.get()]
+            print(templist)
+        else:
+            message.showwarning(title='spam', message='Select a .csv file first!')
 
-    def callback(self,event):
-        print(self.outLine.var.get())
-
-    def getOutputLocation(self,event):
-        self.output.set("../" + self.outputEntry.get().split('/')[-1])
-
-    def getOutputFile(self):
-        self.output.set(askopenfilename())
-
-    def createDXF(self, *args):
-        trophy.main(list(self.arguments).append(self.csvFile.get()))
 
     def setupWin(self):
         self.tk.wm_iconbitmap(default='icon.ico')
+
     def setupMac(self):
         self.tk.wm_iconbitmap(bitmap='icon.ico')
+
 
 
 
