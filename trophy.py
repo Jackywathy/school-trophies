@@ -235,12 +235,20 @@ def read_csv(path, filename='output', outpath='', outline=False, logopoints=Fals
                     continue
 
                 if len(line) != 2:  # invalid line
-                    with open('stderr.txt', 'a') as stderr:
-                        stderr.write(' '.join(line) + 'Line %d' % iteration+1)
                     print("Line %d is invalid [%s]" % (iteration+1, line))
+
+
 
                 else:
                     name, year = line
+                    if len(name) == 0 and len(year) == 0: # empty line,created by EXCLE WHEN YOU PRESS ARROW DOWN COMMAND
+                        continue
+
+                    if len(name) == 0 or len(year) == 0:
+                        print("Length of line %d, is invalid (one entry is 0 length)" % (iteration+1))
+                        continue
+
+
 
                     if counter == 0:
                         _drawing = dxf.drawing()
@@ -276,8 +284,8 @@ def main(argv):
     arg_outline = False
     arg_gen_points = False
     arg_delete_csv = False
-    arg_filename = 'output'
-    arg_fileout = None
+    arg_filename = ['','output']
+    arg_dummy = False
 
     if len(argv) > 1:
 
@@ -289,13 +297,14 @@ def main(argv):
             print('\n')
 
             print("OPTIONS: (-- and - can be used)")
-            print("%-30s %s" %("\t--outline", "Draw a outline around the trophy"))
-            print("%-30s %s" %("\t--interact", "Enable interactive input with automatic formatting, saving as a csv when done"))
-            print("%-30s %s" % ("\t--interact-noformat", "Enable interactive input, saving as a csv when done, without automatic formatting"))
-            print("%-30s %s" % ("\t--gen-points", "Also generate a logopoints.txt for usage in LISP"))
-            print("%-30s %s" % ("\t--delete-csv", "Deletes the csv file after successful reading"))
-            print("%-30s %s" % ("\t--filename (filename)", "Name the output files"))
-            print("%-30s %s" % ("\t--fileout (filepath)", "Directory where output is sent"))
+            print("%-15s %s" %("\t--outline", "Draw a outline around the trophy"))
+            print("%-15s %s" %("\t--interact", "Enable interactive input with automatic formatting, saving as a csv when done"))
+            print("%-15s %s" % ("\t--gen-points", "Also generate a logopoints.txt for usage in LISP"))
+            print("%-15s %s" % ("\t--delete-csv", "Deletes the csv file after successful reading"))
+            print("%-15s %s" % ("\t--filename (filename)", "Name the output files"))
+            print("%-15s %s" % ("\t--fileout (filepath)", "Directory where output is sent"))
+            print("%-15s %s" % ("\t--dummy", "Do not create output files"))
+
             sys.exit(0)
         argv.pop(0)
 
@@ -332,16 +341,20 @@ def main(argv):
                     arg_delete_csv = True
 
                 elif i == '--filename' or i == '-filename':
-                    if arg_filename != 'output':
+                    if arg_filename[1] != 'output':
                         print("Duplicate --filename option")
                         sys.exit(-1)
-                    arg_filename = argv.pop(0)
+                    arg_filename[1] = argv.pop(0)
 
                 elif i == '--fileout' or i == '-fileout':
-                    if arg_fileout:
+                    if arg_filename[0]:
                         print("Duplicate --fileout option")
                         sys.exit(-1)
-                    arg_fileout = argv.pop(0)
+                    arg_filename[0] = argv.pop(0)
+
+                elif i == '--dummy' or i == '-dummy':
+                    arg_dummy = True
+
 
 
                 else:
@@ -351,9 +364,17 @@ def main(argv):
             else:
                 # must be CSV path -- if override is speciifed then use the overide
 
-                print("Reading from '%s'" % i)
+                if arg_filename[0] and not (arg_filename[0].endswith('\\') or arg_filename[0].endswith('/')):
+                    if os.name == 'nt':
+                        arg_filename[0] += '\\'
+                    else:
+                        arg_filename[0] += '/'
+
+                print("Reading from '%s'" % ''.join(arg_filename))
+                if arg_dummy:
+                    sys.exit(0)
                 if os.path.exists(os.path.expanduser(i)):
-                    read_csv(i, outline=arg_outline, logopoints=arg_gen_points, filename=arg_filename)
+                    read_csv(i, outline=arg_outline, logopoints=arg_gen_points, filename=''.join(arg_filename))
                     if arg_delete_csv:
                         os.remove(i)
                     sys.exit(0)

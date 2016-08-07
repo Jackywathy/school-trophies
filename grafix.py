@@ -6,6 +6,7 @@ from platform import system
 import trophy
 import string
 import sys
+import csv
 counter = 0
 alpha = string.ascii_letters * 10
 
@@ -13,6 +14,8 @@ LIMIT = 28 # limit of string
 
 WINDOWS = 'win'
 ELSE = 'lin'
+
+
 
 
 
@@ -28,7 +31,6 @@ class Application:
         sys.stdout.flush()
 
     def __init__(self):
-        self.arguments = set()
         self.tk = Tk()
         self.tk.bind("<Escape>", self.quit)
 
@@ -36,7 +38,7 @@ class Application:
         self.notebook = ttk.Notebook(self.notebookFrame)
 
 
-        self.tk.wm_title("Trophy Creator \u0254\u20DD Forge")
+        self.tk.wm_title("Trophy Creator #Forge")
         self.tk.iconbitmap('icon.ico')
 
         # windows only setup
@@ -61,6 +63,21 @@ class Application:
 
         self.tk.minsize(self.page1.winfo_width(), self.page1.winfo_height())
         mainloop()
+
+    csvdata = [
+        ["##name", "##year"],
+        ["Shourov Quazi", "2016"],
+        ["Jacq Jiang", "2016"],
+        ["Archie Fox", "2016"],
+        ['##lines with 2 hashes will be ignored', '##but must be balanced']
+    ]
+
+    def clone_trophy(self):
+        with open(asksaveasfilename(defaultextension='csv'),'w') as f:
+            spamwriter = csv.writer(f,delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            for i in Application.csvdata:
+                spamwriter.writerow(i)
+
 
     def create_frames(self):
 
@@ -99,23 +116,29 @@ class Application:
         self.deletecsv = Checkbutton(self.optionFrame, text='Delete csv afterwards?', variable=delete_temp)
         self.deletecsv.var = delete_temp
 
+        self.create_template_trophy = Button(self.optionFrame, text='Get template', command=self.clone_trophy)
+
         self.outLine.grid(row=0, column=0, padx=10,pady=5)
         self.deletecsv.grid(row=0,column=1, padx=10,pady=5)
+        self.create_template_trophy.grid(row=100, column=0, columnspan=2)
+
+
 
 
 
 
         # Page1 Frame Grids'
-        self.optionFrame.grid(row=0,column=2)
+        self.optionFrame.grid(row=0,columnspan=4)
 
 
 
         # Page2 Frame Grid's
 
-        self.notebook.pack(fill=BOTH,expand=1)
+        self.notebook.grid(row=0,columnspan=3,sticky=W)
+
 
         self.notebook.add(self.page1, text='Trophy', sticky=E+S)
-        self.notebook.add(self.page2, text='Medal', sticky=E+S)
+        self.notebook.add(self.page2, text='Plaque', sticky=E+S)
         # csv INPUT frame
         self.csvAndOK.pack(fill=BOTH,expand=1,padx=10,pady=5)
         self.notebookFrame.pack(fill=BOTH,expand=1,padx=10,pady=5,anchor=W)
@@ -124,6 +147,9 @@ class Application:
     def getCsvFile(self):
         self.csvFile.set(askopenfilename())
         x = self.csvFile.get()
+        if not x:
+            return
+
         try:
             if not ((x[-4]=='.') and (x[-3]=='c' or x[-3]=='C') and (x[-2]=='s' or x[-2]=='S') and (x[-1]=='v' or x[-1]=='V')):
                 message.showwarning(title='spam',message='The file does not end in .csv')
@@ -153,7 +179,18 @@ class Application:
     def getOutputFile(self, *args):
         if self.csvFile.get():
             self.outputFile = asksaveasfilename(defaultextension='.dxf')
-            templist = ['popped'] + list(self.arguments) + ['--filename', 'lol filename doesnt work yet'] + [self.csvFile.get()]
+            print(self.outputFile)
+            # create argument list
+            arguments = []
+            if True: # if trophy tab is in
+                if self.outLine.var.get():
+                    arguments.append("--outline")
+                if self.deletecsv.var.get():
+                    arguments.append("--delete-csv")
+
+
+            templist = ['trophy'] + arguments + ['--filename', self.outputFile] + [self.csvFile.get()]
+            print(templist)
             trophy.main(templist)
             
         else:
@@ -168,5 +205,14 @@ class Application:
 
 
 
+
+
+
+
+def flip(boolean):
+    if boolean:
+        return False
+    else:
+        return True
 
 Application()
