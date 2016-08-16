@@ -72,7 +72,8 @@ class Application:
         ['##lines with 2 hashes will be ignored', '##but must be balanced']
     ]
 
-    def clone_trophy(self):
+    @staticmethod
+    def clone_template():
         with open(asksaveasfilename(defaultextension='csv'),'w') as f:
             spamwriter = csv.writer(f,delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
             for i in Application.csvdata:
@@ -84,13 +85,20 @@ class Application:
         # frames
         self.page1 = ttk.Frame(self.tk)
         self.page2 = ttk.Frame(self.tk)
+
+
         self.csvAndOK = Frame(self.tk)
         self.csvFrame = LabelFrame(self.csvAndOK,text="CSV In", width=100, height=100)
-        self.outputFrame = LabelFrame(self.tk, text='Output', width=100)
-        self.optionFrame = Frame(self.page1, width=100)
+
+
+        #FRAME1!
+        self.optionFrameTrophy = Frame(self.page1, width=100)
+        #FRAME2!
+        self.optionFramePlaque = Frame(self.page2, width=100)
 
         self.csvFrame.grid(row=0,column=0,columnspan=3)
 
+        """CSV STUFF!"""
 
         self.okButton = Button(self.csvAndOK, text="OK",command=self.getOutputFile)
         self.okButton.grid(row=0,column=4)
@@ -100,6 +108,8 @@ class Application:
         self.csvIn = Entry(self.csvFrame, width=35)
         self.csvIn.bind("<Return>", self.getCsvText)
 
+
+
         self.csvText.grid(row=0,column=0)
         self.csvIn.grid(row=0,column=1,columnspan=2)
         self.csvBrowse.grid(row=0,column=4)
@@ -107,28 +117,42 @@ class Application:
 
 
 
-        ####### Options-
-        out_temp = BooleanVar()
-        delete_temp = BooleanVar()
-        self.outLine = Checkbutton(self.optionFrame,text='Outline', variable=out_temp)
-        self.outLine.var = out_temp
+        """ TROPHEY OPTIONS!!"""
+        out_temp_trophy = BooleanVar()
+        delete_temp_trophy = BooleanVar()
+        self.outLineTrophy = Checkbutton(self.optionFrameTrophy, text='Outline', variable=out_temp_trophy)
+        self.outLineTrophy.var = out_temp_trophy
 
-        self.deletecsv = Checkbutton(self.optionFrame, text='Delete csv afterwards?', variable=delete_temp)
-        self.deletecsv.var = delete_temp
+        self.deletecsvTrophy = Checkbutton(self.optionFrameTrophy, text='Delete csv afterwards?', variable=delete_temp_trophy)
+        self.deletecsvTrophy.var = delete_temp_trophy
 
-        self.create_template_trophy = Button(self.optionFrame, text='Get template', command=self.clone_trophy)
+        self.create_template_trophy = Button(self.optionFrameTrophy, text='Get template', command=self.clone_template)
 
-        self.outLine.grid(row=0, column=0, padx=10,pady=5)
-        self.deletecsv.grid(row=0,column=1, padx=10,pady=5)
+        self.outLineTrophy.grid(row=0, column=0, padx=10, pady=5)
+        self.deletecsvTrophy.grid(row=0, column=1, padx=10, pady=5)
         self.create_template_trophy.grid(row=100, column=0, columnspan=2)
 
+        """ PLAQUE OPTIONS!!"""
+        out_temp_plaque = BooleanVar()
+        delete_temp_plaque = BooleanVar()
+        self.outLinePlaque = Checkbutton(self.optionFramePlaque, text='Outline', variable=out_temp_plaque)
+        self.outLinePlaque.var = out_temp_plaque
 
+        self.deletecsvPlaque = Checkbutton(self.optionFramePlaque, text='Delete csv afterwards?', variable=delete_temp_plaque)
+        self.deletecsvPlaque.var = delete_temp_plaque
+
+        self.create_template_Plaque = Button(self.optionFramePlaque, text='Get template', command=self.clone_template)
+
+        self.outLinePlaque.grid(row=0, column=0, padx=10, pady=5)
+        self.deletecsvPlaque.grid(row=0, column=1, padx=10, pady=5)
+        self.create_template_Plaque.grid(row=100, column=0, columnspan=2)
 
 
 
 
         # Page1 Frame Grids'
-        self.optionFrame.grid(row=0,columnspan=4)
+        self.optionFrameTrophy.grid(row=0, columnspan=4)
+        self.optionFramePlaque.grid(row=0, columnspan=4)
 
 
 
@@ -137,13 +161,13 @@ class Application:
         self.notebook.grid(row=0,columnspan=3,sticky=W)
 
 
+
         self.notebook.add(self.page1, text='Trophy', sticky=E+S)
         self.notebook.add(self.page2, text='Plaque', sticky=E+S)
+
         # csv INPUT frame
         self.csvAndOK.pack(fill=BOTH,expand=1,padx=10,pady=5)
         self.notebookFrame.pack(fill=BOTH,expand=1,padx=10,pady=5,anchor=W)
-        self.outputFrame.pack(fill=BOTH,expand=1,padx=10,pady=5)
-
     def getCsvFile(self):
         self.csvFile.set(askopenfilename())
         x = self.csvFile.get()
@@ -183,9 +207,9 @@ class Application:
             # create argument list
             arguments = []
             if True: # if trophy tab is in
-                if self.outLine.var.get():
+                if self.outLineTrophy.var.get():
                     arguments.append("--outline")
-                if self.deletecsv.var.get():
+                if self.deletecsvTrophy.var.get():
                     arguments.append("--delete-csv")
 
 

@@ -97,13 +97,12 @@ def generate_template(h1,h2,w,drawing):
 
 def draw(x,y,x1,y1,d):
     """Draws a line from (x,y) to (x1,y1) on drawing d"""
-    assert(type(d) == dxfwrite.drawing.Drawing)     
     d.add(dxf.line((x,y),(x1,y1),color=1, layer='LINES',thickness=0.01))
 
 
-def text_align(text, x_align, y_align, height, d ,style= "TIMES_ITALIC",rotation=0, color=BLACK):
+def text_align(text, x_align, y_align, height, d ,style= "TIMES_ITALIC",rotation=0, color=BLACK,mirror=dxfwrite.MIRROR_X):
     """Creates text with the middle aligned to x_al. and y_al."""
-    text = dxf.text(text, height = height,mirror=dxfwrite.MIRROR_X,halign=CENTER, alignpoint = (x_align,y_align),
+    text = dxf.text(text, height = height,mirror=mirror,halign=CENTER, alignpoint = (x_align,y_align),
                     style=style, layer='LINES', rotation=rotation, color=color, linetype='ByBlock')
     d.add(text)
 
@@ -189,6 +188,8 @@ def save_file(drawing, filename='output', path = '', start_iter = 1):
     path += filename
     if path.endswith('.dxf'):
         path = path[:-4]
+
+
     if os.path.exists(os.path.expanduser(path)+'.dxf'):
         while True:
             if start_iter > K_MAX_ITER:
@@ -223,7 +224,7 @@ def write_points():
 #
 
 
-def read_csv(path, filename='output', outpath='', outline=False, logopoints=False):
+def csv_to_trophy(path, filename='output', outpath='', outline=False, logopoints=False):
     """Reads from a csv, trophifying all of the things"""
     try:
         with open(os.path.expanduser(path)) as f:
@@ -374,7 +375,7 @@ def main(argv):
                 if arg_dummy:
                     sys.exit(0)
                 if os.path.exists(os.path.expanduser(i)):
-                    read_csv(i, outline=arg_outline, logopoints=arg_gen_points, filename=''.join(arg_filename))
+                    csv_to_trophy(i, outline=arg_outline, logopoints=arg_gen_points, filename=''.join(arg_filename))
                     if arg_delete_csv:
                         os.remove(i)
                     sys.exit(0)
