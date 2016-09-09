@@ -113,7 +113,6 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         # long side is down!
         rotation = 270
         file_out.append((x_r + crest_y, y_r -mid_trophy, '270'))
-
         x_sbhs,y_sbhs = x_r + sbhs_y, y_r - mid_trophy
         x_sac, y_sac = x_r + sac_y,  y_r - mid_trophy
         x_the, y_the = x_r + the_y, y_r - mid_trophy
@@ -403,3 +402,10 @@ if __name__ == "__main__":
 # -1 = invalid options
 # -2 = cannot find csv file
 # -3 = no csv file specified
+
+class TrophyContainer:
+    def __init__(self, list_of_points):
+
+        ...
+class TrophyError(Exception):
+    pass
