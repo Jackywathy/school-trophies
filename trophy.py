@@ -11,26 +11,26 @@ K_NAME = 'Trophy'
 __author__ = 'Shovel, Jack, and Archie @sydneyboyshigh.com All Rights Unreserved'
 __version__ = 'Beta 1.2'
 
-h1=155.5 
-h2= 225 
+h1 = 155.5
+h2 = 225
 w = 90.4 
 BLACK = 250
 
-file_out = []
 logo_width = float(40)
 logo_height = float(120)
 
 # sum constants
-mid_trophy = 45
-crest_y = 129
-sbhs_y = 120 # sydney boys high
-sac_y = 110   # student award scheme
-the_y = 91
-school_y = 79
-trophy_y = 67
-awarded_y = 44.5
-name_y = 34.5
-year_y = 24
+mid_trophy = 45  # middle of trophy, in Y
+
+crest_y = 129    # location of crest
+sbhs_y = 120     # sydney boys high
+sac_y = 110      # student award scheme
+the_y = 91       # the
+school_y = 79    # school
+trophy_y = 67    # trophy
+awarded_y = 44.5 # awarded to
+name_y = 34.5    # NAME
+year_y = 24      # YEAR
 
 #
 # Trophy parts are inserted with the midpint being (mid_trophy)
@@ -41,6 +41,12 @@ def generate_ref_point(h1,h2,w):
     """
     Shovel's reference point generator: returns a list of 10 reference points
     that each should be the bottom left corner of a trophy
+    0 = bottom left with long edge pointing down
+    1-3 = stacked on top of 0
+    4 = next to 0, long edge pointing up
+    5-7 = stacked on 4
+    8 = sharp edge pointing up, bottom right
+    9 = sharp edge pointing down, above 8
     """
     ref = []
     xgap = (600-(h1+h2+w))/4
@@ -110,9 +116,8 @@ def text_align(text, x_align, y_align, height, d ,style= "TIMES_ITALIC",rotation
 def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
     x_r, y_r = ref_point
     if long_side_dir == 'down':
-        # long side is down!
         rotation = 270
-        file_out.append((x_r + crest_y, y_r -mid_trophy, '270'))
+        #file_out.append((x_r + crest_y, y_r -mid_trophy, '270'))
         x_sbhs,y_sbhs = x_r + sbhs_y, y_r - mid_trophy
         x_sac, y_sac = x_r + sac_y,  y_r - mid_trophy
         x_the, y_the = x_r + the_y, y_r - mid_trophy
@@ -123,10 +128,8 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         x_year, y_year = x_r + year_y, y_r - mid_trophy
 
     elif long_side_dir == 'up':
-        # if trophy is pointing up
         rotation = 90
-        file_out.append((x_r - crest_y, y_r + mid_trophy, '090'))
-
+        #file_out.append((x_r - crest_y, y_r + mid_trophy, '090'))
         x_sbhs,y_sbhs = x_r - sbhs_y, y_r + mid_trophy
         x_sac, y_sac = x_r - sac_y,  y_r + mid_trophy
         x_the, y_the = x_r - the_y, y_r + mid_trophy
@@ -137,9 +140,8 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         x_year, y_year = x_r - year_y, y_r + mid_trophy
 
     elif long_side_dir == 'right':
-        # if the trophy is straight
         rotation = 0
-        file_out.append((x_r+mid_trophy, y_r+crest_y, '000'))
+        #file_out.append((x_r+mid_trophy, y_r+crest_y, '000'))
         x_sbhs,y_sbhs = mid_trophy + x_r, sbhs_y + y_r
         x_sac, y_sac  = mid_trophy + x_r, sac_y  + y_r
         x_the, y_the  = mid_trophy + x_r, the_y  + y_r
@@ -150,9 +152,8 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
         x_year, y_year= mid_trophy + x_r, y_r + year_y
 
     elif long_side_dir == 'left':
-        # if it is backwards
         rotation = 180
-        file_out.append((x_r-mid_trophy, y_r - crest_y, '180'))
+        #file_out.append((x_r-mid_trophy, y_r - crest_y, '180'))
         x_sbhs,y_sbhs = x_r-mid_trophy, y_r  - sbhs_y
         x_sac, y_sac = x_r-mid_trophy,  y_r  - sac_y
         x_the, y_the = x_r-mid_trophy,  y_r  - the_y
@@ -178,8 +179,10 @@ def add_school_trophy(ref_point, drawing, name, year, long_side_dir):
     text_align("awarded to", x_awarded, y_awarded, 7, drawing, rotation=rotation)
     text_align(name.upper(), x_name,y_name, 4.5, drawing, style='STANDARD', rotation=rotation)
     text_align(str(year), x_year, y_year, 6, drawing,rotation=rotation)
-    
-ref_points = (generate_ref_point(h1,h2,w))
+
+
+REF_POINTS = (generate_ref_point(h1, h2, w))
+
 
 
 def save_file(drawing, filename='output', path = '', start_iter = 1):
@@ -187,31 +190,32 @@ def save_file(drawing, filename='output', path = '', start_iter = 1):
     path += filename
     if path.endswith('.dxf'):
         path = path[:-4]
+    path = os.path.expanduser(path)
 
-
-    if os.path.exists(os.path.expanduser(path)+'.dxf'):
+    if os.path.exists(path+'.dxf'):
+        # it exists already, try to save with number
         while True:
             if start_iter > K_MAX_ITER:
                 input("Over 100 trophies generated: Pausing until RETURN is pressed. Please empty out "
                         "the directory/path (%s)" % path)
                 start_iter = default_iter
             temp = path + '_' + str(start_iter) + '.dxf'
-            if not os.path.exists(os.path.expanduser(temp)):
-                drawing.saveas(os.path.expanduser(temp))
+            if not os.path.exists(temp):
+                drawing.saveas(temp)
                 break
             else:
                 start_iter += 1
-
     else:
-        drawing.saveas(os.path.expanduser(path)+'.dxf')
+        drawing.saveas(path+'.dxf')
         
-
+'''
 def write_points():
     with open('logopoints.txt', 'w') as f:
         for iteration, item in enumerate(file_out):
             if iteration >= 10:
                 return
             print(str(item[2]), "{0:.2f}".format(item[0]) + ',' + "{0:.2f}".format(item[1]), file = f)
+'''
 
 # format of this file
 #
@@ -223,62 +227,62 @@ def write_points():
 #
 
 
-def csv_to_trophy(path, filename='output', outpath='', outline=False, logopoints=False):
-    """Reads from a csv, trophifying all of the things"""
-    try:
-        with open(os.path.expanduser(path)) as f:
-            reader = csv.reader(f)
-            counter = 0
-            drawing_counter = 0
-            for iteration, line in enumerate(reader):
-                if line[0].startswith('##') or line[1].startswith('##'): # comment line
-                    continue
 
-                if len(line) != 2:  # invalid line
-                    print("Line %d is invalid [%s]" % (iteration+1, line))
+def csv_to_trophy(csv_stream, filename='output', outpath='', outline=False, logopoints=False, validpoints=(0,1,2,3,4,5,6,7,8,9),debugstring='',simulate=False):
+    """Reads from a csv, given a stream, trophifying all the points given, not trophyying the non-validpoints"""
+    has_content = False
+    if logopoints:
+        print("LP is now depreciated! plz dont use")
+    current_drawing = dxf.drawing()
+    if outline:
+        generate_template(h1, h2, w, current_drawing)
 
-
-
-                else:
-                    name, year = line
-                    if len(name) == 0 and len(year) == 0: # empty line,created by EXCLE WHEN YOU PRESS ARROW DOWN COMMAND
-                        continue
-
-                    if len(name) == 0 or len(year) == 0:
-                        print("Length of line %d, is invalid (one entry is 0 length)" % (iteration+1))
-                        continue
+    for iteration, valid in enumerate(validpoints):
+        try:
+            line = next(csv_stream)
+        except StopIteration:
+            if has_content and not simulate:
+                save_file(current_drawing, filename, outpath)
+            raise
 
 
+        # get next item from stream
+        if len(line) != 2:  # invalid line
+            print("Line %d is invalid [%s]" % (iteration + 1, line))
+        if line[0].startswith('##') or line[1].startswith('##'):  # comment line
+            continue
+        else:
+            name, year = line
+            if len(name) == 0 and len(year) == 0:  # empty line,created by EXCLE WHEN YOU PRESS ARROW DOWN COMMAND
+                continue
+            if len(name) == 0 or len(year) == 0:
+                print("Length of line %d, is invalid (one entry is 0 length)" % (iteration + 1))
+                continue
+            has_content = True
+            if valid <= 3:
+                add_school_trophy(REF_POINTS[valid], current_drawing, name, year, 'down')
+            elif valid <= 7:
+                add_school_trophy(REF_POINTS[valid], current_drawing, name, year, 'up')
+            elif valid == 8:
+                add_school_trophy(REF_POINTS[valid], current_drawing, name, year, 'right')
+            elif valid == 9:
+                add_school_trophy(REF_POINTS[valid], current_drawing, name, year, 'left')
+    if not simulate:
+        save_file(current_drawing, filename, outpath)
 
-                    if counter == 0:
-                        _drawing = dxf.drawing()
-                        drawing_counter += 1
-                        if outline:
-                            generate_template(h1,h2,w,_drawing)
 
-                    if counter <= 3:  # trophies on the left, pointing down
-                        add_school_trophy(ref_points[counter], _drawing, name, year, 'down')
 
-                    elif counter <= 7:
-                        add_school_trophy(ref_points[counter], _drawing, name, year, 'up')
+def read_limited(path):
+    with open(path) as f:
+        csv_p = os.path.expanduser(f.readline().rstrip())
+        print(csv_p)
+        with open(csv_p) as csv_location:
+            csvreader = csv.reader(csv_location)
+            for limited_list in f:
+                limited = limited_list.split()
+                csv_to_trophy(csvreader, validpoints=map(int, limited),outline=True)
 
-                    elif counter == 8:
-                        add_school_trophy(ref_points[counter], _drawing, name, year, 'right')
-
-                    elif counter == 9:
-                        add_school_trophy(ref_points[counter], _drawing, name, year, 'left')
-                        counter = -1
-                        save_file(_drawing, filename, outpath, drawing_counter)
-
-                    counter += 1
-            if counter != 0:
-                save_file(_drawing, filename, outpath, drawing_counter)
-            if logopoints:
-                write_points()
-    except FileNotFoundError:
-        print("file '%s' not found! Aborting"% path)
-        sys.exit(-4)
-
+'''
 
 def main(argv):
     arg_outline = False
@@ -304,6 +308,7 @@ def main(argv):
             print("%-15s %s" % ("\t--filename (filename)", "Name the output files"))
             print("%-15s %s" % ("\t--fileout (filepath)", "Directory where output is sent"))
             print("%-15s %s" % ("\t--dummy", "Do not create output files"))
+
 
             sys.exit(0)
         argv.pop(0)
@@ -393,19 +398,28 @@ def main(argv):
     else:
         print("Usage: %s [OPTIONS] CSV" % K_NAME)
         print('Type %s --help to see options' % K_NAME)
+'''
 
-if __name__ == "__main__":
-    main(sys.argv)
+
+
+
+
+
+    #read_limited("input.txt")
+'''
+            print("%-15s %s" %("\t--outline", "Draw a outline around the trophy"))
+            print("%-15s %s" %("\t--interact", "Enable interactive input with automatic formatting, saving as a csv when done"))
+            print("%-15s %s" % ("\t--gen-points", "Also generate a logopoints.txt for usage in LISP"))
+            print("%-15s %s" % ("\t--delete-csv", "Deletes the csv file after successful reading"))
+            print("%-15s %s" % ("\t--filename (filename)", "Name the output files"))
+            print("%-15s %s" % ("\t--fileout (filepath)", "Directory where output is sent"))
+            print("%-15s %s" % ("\t--dummy", "Do not create output files"))
+            '''
+
+
 
 #EXIT CODES
 # 0 = NORMAL
 # -1 = invalid options
 # -2 = cannot find csv file
 # -3 = no csv file specified
-
-class TrophyContainer:
-    def __init__(self, list_of_points):
-
-        ...
-class TrophyError(Exception):
-    pass
