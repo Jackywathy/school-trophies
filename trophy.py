@@ -3,7 +3,6 @@ import dxfwrite
 from dxfwrite import DXFEngine as dxf
 import os
 import csv
-import sys
 
 K_MAX_ITER = 100
 K_NAME = 'Trophy'
