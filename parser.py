@@ -1,10 +1,17 @@
-import os,sys
+import os
 from argparse import ArgumentTypeError, ArgumentParser, ArgumentDefaultsHelpFormatter
 import csv
 import collections
 import trophy, plaque
-class TxtParser:
-    def __init__(self, fileobj):
+
+K_NAME = "parser"
+
+__author__ = 'Shovel, Jack, and Archie @sydneyboyshigh.com All Rights Unreserved'
+__version__ = 'Beta 1.3'
+
+
+class CsvFileParser:
+    def __init__(self, fileobj, allcsv=False):
         self.trophy_points = []
         self.plaque_points = []
         self.csv = []
@@ -12,16 +19,21 @@ class TxtParser:
         for line in fileobj:
             proc = line.rstrip()
             if proc.replace(' ',''):
-                if proc.startswith("{CSV}"):
+                if allcsv:
+                    self.csv.append(proc)
+                elif proc.startswith("{CSV}"):
                     self.current = self.csv
                 elif proc.startswith("{TROPHY_LIMITER}"):
                     self.current = self.trophy_points
                 elif proc.startswith("{PLAQUE_LIMITER}"):
                     self.current = self.plaque_points
                 else:
-                    self.current.append(proc)
+                    try:
+                        self.current.append(proc)
+                    except AttributeError:
+                        raise ValueError("Missing Declarations!")
         self.trophy_points = [self.check_size(tuple(map(int,i.split())), 9) for i in self.trophy_points]
-        self.plaque_points = [self.check_size(tuple(map(int,i.split())), 9) for i in self.plaque_points]
+        self.plaque_points = [self.check_size(tuple(map(int,i.split())), 153) for i in self.plaque_points]
         csv_obj = csv.reader(self.csv)
         self.TROPHY=[]
         self.PLAQUE=[]
@@ -63,12 +75,16 @@ class TxtParser:
         except StopIteration:
             pass
 
-
-
-
-
-
-
+    def eval_plaque(self, filename='output', outpath='', outline=False, simulate=False):
+        iterator = iter(self.PLAQUE)
+        try:
+            while True:
+                plaque.csv_to_plaque(iterator,filename,outpath,outline=outline,
+                                     validpoints=self.pop_or_default(self.plaquep, plaque.PLAQUE_DEFAULT),
+                                     simulate=simulate)
+        except StopIteration:
+            pass
+`
 
 
 class InputHolder:
@@ -76,73 +92,97 @@ class InputHolder:
         self.path = os.path.expanduser(path)
 
         try:
-            self._file = open(self.path)
+            self.file = open(self.path)
         except FileNotFoundError:
             raise ArgumentTypeError("Path not found!")
         except IOError:
-            raise ArgumentTypeError("The File cannot be opened")
+            raise ArgumentTypeError("The File cannot be opened! Insufficent Permissions")
 
 
     def __repr__(self):
         return "InputHolder{" + str(self.path)+"}"
 
     def close(self):
-        self._file.close()
+        self.file.close()
 
 
-def parse_args():
+def make_parser():
     """Parse all the args required for the parser!"""
-    global parser
-    parser = ArgumentParser(description="Draw school trophies", prog='Trophy Generator',formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-outline", help="Draws an outline template", action='store_true', default=False)
-    #parser.add_argument("-interact", help="Allows interactive input", action='store_true', default=False)
-    parser.add_argument("-delete-csv", help="Deletes the csv file after successful reading", action='store_true', default=False)
-    parser.add_argument("-filename", metavar="str",nargs=1,type=str, help="Set the filename of the output file", default='output.dxf')
-    parser.add_argument("-fileout", metavar='Path', nargs=1, type=str, help="Set the output path of the output file", default='')
-    parser.add_argument("-simulate", help="Do not create output files", action='store_true', default=False)
-    parser.add_argument("-oldcsv", help="Use old 2-line csv files", action='store_true', default=False)
-    parser.add_argument("-force-txt", help="Force read as formatted txt file", action='store_true', default=False)
-    parser.add_argument("-force-csv", help="Force read as csv file", action='store_true', default=False)
+    parser = ArgumentParser(description="Draw school awards!", prog='Awards Generator',formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-o',"--outline", help="Draws an outline template", action='store_true', default=False)
+    parser.add_argument('-d',"--delete-csv", help="Deletes the csv file after successful reading", action='store_true', default=False)
+
+    parser.add_argument('-s',"--simulate", help="Do not create output files", action='store_true', default=False)
+    parser.add_argument('-oc', "--oldcsv", help="Use old 2-line csv files", action='store_true', default=False)
+    group = parser.add_mutually_exclusive_group()
+
+    group.add_argument('-t', "--txt", help="Force read as formatted txt file", action='store_true', default=False)
+    group.add_argument('-c', "--csv", help="Force read as csv file", action='store_true', default=False)
+
+    parser.add_argument('-n',"--filename", metavar="str",nargs=1,type=str, help="Set the filename of the output file", default='output.dxf')
+    parser.add_argument('-f',"--fileout", metavar='Path', nargs=1, type=str, help="Set the output path of the output file", default='')
 
     parser.add_argument("InputPath", help="Input Path for csv/text file in", type=InputHolder, nargs=1)
+    return parser
 
-    #arguments = parser.parse_args()
+
 def parse_parser(namespace):
     """Parse-ception!"""
     # get the extension
-    if namespace.force_csv:
+    if isinstance(namespace.filename, list):
+        namespace.filename = namespace.filename[0]
+
+    f = namespace.InputPath[0].file
+    path = namespace.InputPath[0].path
+    if namespace.csv:
         ext = 'csv'
-    elif namespace.force_txt:
+    elif namespace.txt:
         ext = 'txt'
-    elif namespace.InputPath.lower().endswith('txt'):
+    elif path.endswith('txt'):
         ext = 'txt'
-    elif namespace.InputPath.lower().endswith('csv'):
+    elif path.endswith('csv'):
         ext = 'csv'
+    elif 'csv' in path:
+        ext = 'csv'
+    elif 'txt' in path:
+        ext = 'txt'
     else:
         ext = 'csv'
-    print(namespace.InputPath[0], type(namespace.InputPath[0]))
-    f = namespace.InputPath[0]._file
+
     if ext == 'csv':
+        csv_reader = CsvFileParser(f, True)
+        csv_reader.eval_trophy(filename=namespace.filename,
+                               outpath=namespace.fileout,
+                               outline=namespace.outline,
+                               simulate=namespace.simulate
+                               )
+        csv_reader.eval_plaque(filename=namespace.filename,
+                               outpath=namespace.fileout,
+                               outline=namespace.outline,
+                               simulate=namespace.simulate
+                               )
+        '''
         trophy.csv_to_trophy(csv.reader(f),
                              filename=namespace.filename,
                              outpath=namespace.fileout,
                              outline=namespace.outline,
                              simulate=namespace.simulate
                              )
+        plaque.csv_to_plaque(csv.reader(f),
+                             filename=namespace.filename,
+                             outpath=namespace.fileout,
+                             outline=namespace.outline,
+                             simulate=namespace.simulate
+                             )
+        '''
+
     else:
-        txt_reader = TxtParser(f)
-        txt_reader.eval_trophy(filename=namespace.filename,
+        csv_reader = CsvFileParser(f)
+        csv_reader.eval_trophy(filename=namespace.filename,
                                outpath=namespace.fileout,
                                outline=namespace.outline,
                                simulate=namespace.simulate
                                )
 
-
-
 if __name__ == "__main__":
-        parse_args()
-        parse_parser(parser.parse_args())
-
-
-x = TxtParser(open(os.path.expanduser("~/desktop/input.txt")))
-#x.eval_trophy()
+    parse_parser(make_parser().parse_args())
