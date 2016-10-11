@@ -177,7 +177,10 @@ REF_POINTS = (generate_ref_trophy(h1, h2, w))
 
 def save_file(drawing, filename='output', path = '', start_iter = 1):
     default_iter = start_iter
-    path += filename
+    if "." not in path.split("\\")[-1][1:]: # the path does not contain a dot, therefore no file
+        if not path.endswith("\\"):
+            path += "\\"
+        path += filename
     if path.endswith('.dxf'):
         path = path[:-4]
     path = os.path.expanduser(path)

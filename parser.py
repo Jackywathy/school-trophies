@@ -11,7 +11,7 @@ __version__ = 'Beta 1.3'
 
 
 class CsvFileParser:
-    def __init__(self, fileobj, allcsv=False):
+    def __init__(self, fileobj, allcsv=False, delimiter=','):
         self.trophy_points = []
         self.plaque_points = []
         self.csv = []
@@ -34,9 +34,10 @@ class CsvFileParser:
                         raise ValueError("Missing Declarations!")
         self.trophy_points = [self.check_size(tuple(map(int,i.split())), 9) for i in self.trophy_points]
         self.plaque_points = [self.check_size(tuple(map(int,i.split())), 153) for i in self.plaque_points]
-        csv_obj = csv.reader(self.csv)
+        csv_obj = csv.reader(self.csv, delimiter=delimiter)
         self.TROPHY=[]
         self.PLAQUE=[]
+
         for item in csv_obj:
             print(item)
             if len(item) != 3:
@@ -69,6 +70,8 @@ class CsvFileParser:
         iterator = iter(self.TROPHY)
         try:
             while True:
+                if isinstance(filename, list) or isinstance(outpath, list):
+                    print("HI")
                 trophy.csv_to_trophy(iterator,filename,outpath,outline=outline,
                                      validpoints=self.pop_or_default(self.trophyp, (0,1,2,3,4,5,6,7,8,9)),
                                      simulate=simulate)
@@ -84,7 +87,6 @@ class CsvFileParser:
                                      simulate=simulate)
         except StopIteration:
             pass
-`
 
 
 class InputHolder:
@@ -131,6 +133,9 @@ def parse_parser(namespace):
     # get the extension
     if isinstance(namespace.filename, list):
         namespace.filename = namespace.filename[0]
+    if isinstance(namespace.fileout, list):
+        namespace.fileout = namespace.fileout[0]
+
 
     f = namespace.InputPath[0].file
     path = namespace.InputPath[0].path
@@ -148,7 +153,8 @@ def parse_parser(namespace):
         ext = 'txt'
     else:
         ext = 'csv'
-
+    assert isinstance(namespace.filename, str)
+    assert isinstance(namespace.fileout, str)
     if ext == 'csv':
         csv_reader = CsvFileParser(f, True)
         csv_reader.eval_trophy(filename=namespace.filename,
@@ -161,21 +167,6 @@ def parse_parser(namespace):
                                outline=namespace.outline,
                                simulate=namespace.simulate
                                )
-        '''
-        trophy.csv_to_trophy(csv.reader(f),
-                             filename=namespace.filename,
-                             outpath=namespace.fileout,
-                             outline=namespace.outline,
-                             simulate=namespace.simulate
-                             )
-        plaque.csv_to_plaque(csv.reader(f),
-                             filename=namespace.filename,
-                             outpath=namespace.fileout,
-                             outline=namespace.outline,
-                             simulate=namespace.simulate
-                             )
-        '''
-
     else:
         csv_reader = CsvFileParser(f)
         csv_reader.eval_trophy(filename=namespace.filename,
@@ -186,3 +177,5 @@ def parse_parser(namespace):
 
 if __name__ == "__main__":
     parse_parser(make_parser().parse_args())
+    import time
+    time.sleep(1)
