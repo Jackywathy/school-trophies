@@ -118,7 +118,7 @@ def make_parser():
     parser.add_argument('-oc', "--oldcsv", help="Use old 2-line csv files", action='store_true', default=False)
     group = parser.add_mutually_exclusive_group()
 
-    parser.add_argument("-r", "--r",help="Creates a reference point on all 4 corners of the output", action="store_true", default=None)
+    parser.add_argument("-r", "--r",help="Creates a reference point on all 4 corners of the output", action="store_false", default=None)
 
     group.add_argument('-t', "--txt", help="Force read as formatted txt file", action='store_true', default=False)
     group.add_argument('-c', "--csv", help="Force read as csv file", action='store_true', default=False)

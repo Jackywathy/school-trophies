@@ -58,6 +58,8 @@ def csv_to_plaque(csv_stream, filename='output', outpath='', outline=False, logo
     has_content = False
     if logopoints:
         print("LOGOPOJTS IS DEPRECIATED")
+    if do_corners:
+        print("not yet implemented! do_corners (plaque)")
     current_drawing = dxf.drawing()
     if outline:
         generate_template_plaque(drawing=current_drawing)

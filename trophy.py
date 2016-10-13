@@ -211,6 +211,12 @@ def save_file(drawing, filename='output', path = '', start_iter = 1):
 # this file only needs to be generated once, and placed in autocad support pat
 #
 
+def draw_4_corners(drawing):
+    draw(0,0,1,0,drawing,color=255)
+    draw(0,450,1,0,drawing,color=255)
+    draw(600,0,599,0,drawing,color=255)
+    draw(600,450,599,450,drawing,color=255)
+
 
 def csv_to_trophy(csv_stream, filename='output', outpath='', outline=False, logopoints=False, validpoints=(0,1,2,3,4,5,6,7,8,9),debugstring='', simulate=False, do_corners=False):
     """Reads from a csv, given a stream, trophifying all the points given, not trophyying the non-validpoints"""
@@ -218,6 +224,10 @@ def csv_to_trophy(csv_stream, filename='output', outpath='', outline=False, logo
     if logopoints:
         print("LP is now depreciated! plz dont use")
     current_drawing = dxf.drawing()
+    current_drawing.header["$ACADVER"] = "DUMMY VALUE"
+    if do_corners:
+        draw_4_corners(current_drawing)
+
     if outline:
         generate_template_trophy(h1, h2, w, current_drawing)
 
