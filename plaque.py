@@ -53,7 +53,7 @@ def generate_template_plaque(drawing,h=plaque_height,w=plaque_len):
     return drawing
 
 
-def csv_to_plaque(csv_stream, filename='output', outpath='', outline=False, logopoints=False, validpoints=(0,1,2,3,4,5,6,7,8,9),debugstring='',simulate=False):
+def csv_to_plaque(csv_stream, filename='output', outpath='', outline=False, logopoints=False, validpoints=(0,1,2,3,4,5,6,7,8,9),debugstring='',simulate=False, do_corners=False):
     """Reads from a csv, plaquing all of the things"""
     has_content = False
     if logopoints:

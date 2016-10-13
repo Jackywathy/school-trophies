@@ -212,7 +212,7 @@ def save_file(drawing, filename='output', path = '', start_iter = 1):
 #
 
 
-def csv_to_trophy(csv_stream, filename='output', outpath='', outline=False, logopoints=False, validpoints=(0,1,2,3,4,5,6,7,8,9),debugstring='',simulate=False):
+def csv_to_trophy(csv_stream, filename='output', outpath='', outline=False, logopoints=False, validpoints=(0,1,2,3,4,5,6,7,8,9),debugstring='', simulate=False, do_corners=False):
     """Reads from a csv, given a stream, trophifying all the points given, not trophyying the non-validpoints"""
     has_content = False
     if logopoints:

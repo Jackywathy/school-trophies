@@ -66,7 +66,7 @@ class CsvFileParser:
             assert i <= size
         return iterable
 
-    def eval_trophy(self, filename='output', outpath='', outline=False, simulate=False):
+    def eval_trophy(self, filename='output', outpath='', outline=False, simulate=False, do_corners=False):
         iterator = iter(self.TROPHY)
         try:
             while True:
@@ -74,17 +74,17 @@ class CsvFileParser:
                     print("HI")
                 trophy.csv_to_trophy(iterator,filename,outpath,outline=outline,
                                      validpoints=self.pop_or_default(self.trophyp, (0,1,2,3,4,5,6,7,8,9)),
-                                     simulate=simulate)
+                                     simulate=simulate, do_corners=do_corners)
         except StopIteration:
             pass
 
-    def eval_plaque(self, filename='output', outpath='', outline=False, simulate=False):
+    def eval_plaque(self, filename='output', outpath='', outline=False, simulate=False, do_corners=False):
         iterator = iter(self.PLAQUE)
         try:
             while True:
                 plaque.csv_to_plaque(iterator,filename,outpath,outline=outline,
                                      validpoints=self.pop_or_default(self.plaquep, plaque.PLAQUE_DEFAULT),
-                                     simulate=simulate)
+                                     simulate=simulate, do_corners=do_corners)
         except StopIteration:
             pass
 
@@ -118,6 +118,8 @@ def make_parser():
     parser.add_argument('-oc', "--oldcsv", help="Use old 2-line csv files", action='store_true', default=False)
     group = parser.add_mutually_exclusive_group()
 
+    parser.add_argument("-r", "--r",help="Creates a reference point on all 4 corners of the output", action="store_true", default=None)
+
     group.add_argument('-t', "--txt", help="Force read as formatted txt file", action='store_true', default=False)
     group.add_argument('-c', "--csv", help="Force read as csv file", action='store_true', default=False)
 
@@ -125,6 +127,7 @@ def make_parser():
     parser.add_argument('-f',"--fileout", metavar='Path', nargs=1, type=str, help="Set the output path of the output file", default='')
 
     parser.add_argument("InputPath", help="Input Path for csv/text file in", type=InputHolder, nargs=1)
+
     return parser
 
 
@@ -153,6 +156,13 @@ def parse_parser(namespace):
         ext = 'txt'
     else:
         ext = 'csv'
+    # get if the parser should create ref. points
+    if namespace.reference is None:
+        if namespace.outline:
+            namespace.reference = False
+        else:
+            namespace.reference = True
+
     assert isinstance(namespace.filename, str)
     assert isinstance(namespace.fileout, str)
     if ext == 'csv':
@@ -160,19 +170,28 @@ def parse_parser(namespace):
         csv_reader.eval_trophy(filename=namespace.filename,
                                outpath=namespace.fileout,
                                outline=namespace.outline,
-                               simulate=namespace.simulate
+                               simulate=namespace.simulate,
+                               do_corners=namespace.reference
                                )
         csv_reader.eval_plaque(filename=namespace.filename,
                                outpath=namespace.fileout,
                                outline=namespace.outline,
-                               simulate=namespace.simulate
+                               simulate=namespace.simulate,
+                               do_corners=namespace.reference
                                )
     else:
         csv_reader = CsvFileParser(f)
         csv_reader.eval_trophy(filename=namespace.filename,
                                outpath=namespace.fileout,
                                outline=namespace.outline,
-                               simulate=namespace.simulate
+                               simulate=namespace.simulate,
+                               do_corners=namespace.reference
+                               )
+        csv_reader.eval_plaque(filename=namespace.filename,
+                               outpath=namespace.fileout,
+                               outline=namespace.outline,
+                               simulate=namespace.simulate,
+                               do_corners=namespace.reference
                                )
 
 if __name__ == "__main__":
