@@ -1,5 +1,6 @@
 from dxfwrite import DXFEngine as dxf
-from trophy import text_align, draw, save_file, board_len, board_height
+
+from CLI.trophy import text_align, draw, save_file, board_len, board_height
 
 __author__ = 'Shovel, Jack, and Archie @sydneyboyshigh.com All Rights Unreserved'
 __version__ = 'Beta 1.3'

@@ -1,8 +1,11 @@
+import collections
+import csv
 import os
 from argparse import ArgumentTypeError, ArgumentParser, ArgumentDefaultsHelpFormatter
-import csv
-import collections
-import trophy, plaque
+
+import trophy
+
+from CLI import plaque
 
 K_NAME = "parser"
 
@@ -72,7 +75,7 @@ class CsvFileParser:
             while True:
                 if isinstance(filename, list) or isinstance(outpath, list):
                     print("HI")
-                trophy.csv_to_trophy(iterator,filename,outpath,outline=outline,
+                trophy.csv_to_trophy(iterator, filename, outpath, outline=outline,
                                      validpoints=self.pop_or_default(self.trophyp, (0,1,2,3,4,5,6,7,8,9)),
                                      simulate=simulate)
         except StopIteration:
@@ -82,7 +85,7 @@ class CsvFileParser:
         iterator = iter(self.PLAQUE)
         try:
             while True:
-                plaque.csv_to_plaque(iterator,filename,outpath,outline=outline,
+                plaque.csv_to_plaque(iterator, filename, outpath, outline=outline,
                                      validpoints=self.pop_or_default(self.plaquep, plaque.PLAQUE_DEFAULT),
                                      simulate=simulate)
         except StopIteration:
