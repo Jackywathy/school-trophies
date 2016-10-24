@@ -1,0 +1,30 @@
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\bin\Debug\VisualProject.exe.config
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.Resources.resources
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.vbproj.GenerateResource.Cache
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.xml
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\bin\Debug\VisualProject.exe
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\bin\Debug\VisualProject.pdb
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\bin\Debug\VisualProject.xml
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.exe
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.pdb
+s:\my documents\visual studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.vbprojResolveAssemblyReference.cache
+S:\My Documents\Visual Studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.AddForm.resources
+S:\My Documents\Visual Studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.AwardGenerator.resources
+S:\My Documents\Visual Studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.ChooseLimiters.resources
+S:\My Documents\Visual Studio 2015\Projects\VisualProject\VisualProject\bin\Debug\Resources\parser.exe
+S:\My Documents\Visual Studio 2015\Projects\VisualProject\VisualProject\obj\Debug\VisualProject.ChangeForm.resources
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\bin\Debug\Resources\parser.exe
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\bin\Debug\VisualProject.exe.config
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\bin\Debug\VisualProject.exe
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\bin\Debug\VisualProject.pdb
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\bin\Debug\VisualProject.xml
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.vbprojResolveAssemblyReference.cache
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.AddForm.resources
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.ChooseLimiters.resources
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.ChangeForm.resources
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.AwardGenerator.resources
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.Resources.resources
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.vbproj.GenerateResource.Cache
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.exe
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.xml
+C:\Users\Jack Jiang\Desktop\school-trophies\GUI\VisualProject\obj\Debug\VisualProject.pdb
